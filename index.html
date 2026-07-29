@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Descubra quem você realmente é — Mapa da Alma</title>
+<meta name="description" content="Em 30 segundos, a partir do seu nome e da sua data de nascimento: seu arquétipo, seu personagem, sua carta do Tarô e muito mais. Prévia grátis." />
+<link rel="icon" type="image/png" href="img/favicon.png" />
+<link rel="apple-touch-icon" href="img/favicon.png" />
+<meta name="theme-color" content="#f4ecd8" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Descubra quem você realmente é" />
+<meta property="og:description" content="Seu nome e sua data de nascimento guardam um retrato seu. Veja a prévia de graça." />
+<!-- IMPORTANTE: depois de publicar no Netlify, troque as duas URLs abaixo pelo
+     endereço COMPLETO (ex.: https://seusite.netlify.app/img/og.jpg).
+     WhatsApp e Facebook ignoram caminho relativo e o preview do link sai sem imagem. -->
+<meta property="og:image" content="img/og.jpg" />
+<meta property="og:url" content="/" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{--paper:#f4ecd8;--panel:#efe3c6;--ink:#2e2620;--ink-soft:#5b4f42;
+    --red:#8f2d2d;--navy:#23395b;--gold:#b08d3f;--line:#cbb992;--green:#3f6b3f;}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:radial-gradient(120% 90% at 50% -10%,#fbf5e4 0%,var(--paper) 55%,#eaddbe 100%);
+    color:var(--ink);font-family:"Crimson Text",Georgia,serif;font-size:19px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;min-height:100vh}
+  .wrap{max-width:820px;margin:0 auto;padding:24px 22px 90px}
+  .masthead{text-align:center;padding:16px 0 6px}
+  .kicker{font-family:"Special Elite",monospace;letter-spacing:.28em;text-transform:uppercase;font-size:12px;color:var(--red)}
+  .rule{border:none;border-top:2px solid var(--ink);margin:8px 0}
+  .rule.double{border-top:3px double var(--ink)}
+  h1.title{font-family:"Playfair Display",serif;font-weight:800;font-size:clamp(38px,8vw,64px);line-height:1;margin:6px 0 2px}
+  .subtitle{font-style:italic;color:var(--ink-soft);font-size:clamp(16px,2.8vw,21px);margin:6px 0 8px}
+  .fleuron{color:var(--gold);font-size:22px;letter-spacing:.4em;margin:4px 0}
+  .hero-benefits{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin:10px 0 2px;font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.06em;color:var(--ink-soft);text-transform:uppercase}
+  .hero-benefits span{white-space:nowrap}
+  .card{background:var(--panel);border:1px solid var(--line);
+    box-shadow:0 1px 0 #fff8e6 inset,0 10px 30px rgba(60,45,20,.10);padding:26px 24px;margin:22px 0}
+  .card h2{font-family:"Playfair Display",serif;font-weight:600;font-size:26px;margin:0 0 4px}
+  .field{margin:16px 0}
+  label{display:block;font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+  input,select{width:100%;padding:13px 14px;font-family:"Crimson Text",Georgia,serif;font-size:18px;background:#fbf6e7;border:1px solid var(--line);color:var(--ink);border-radius:2px}
+  input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .row .field{flex:1;min-width:150px}
+  .btn{display:inline-block;width:100%;cursor:pointer;border:none;font-family:"Special Elite",monospace;letter-spacing:.14em;text-transform:uppercase;font-size:16px;padding:17px;background:var(--navy);color:#f4ecd8;border-radius:2px;transition:filter .15s,transform .05s;margin-top:6px}
+  .btn:hover{filter:brightness(1.12)}
+  .btn:active{transform:translateY(1px)}
+  .btn.red{background:var(--red)}
+  .btn.gold{background:linear-gradient(180deg,#c9a24a,#a9822f);color:#241d10}
+  .btn.ghost{background:transparent;color:var(--navy);border:2px solid var(--navy)}
+  .btn.big{font-size:19px;padding:20px}
+  .hint{font-size:14px;color:var(--ink-soft);font-style:italic;margin-top:10px;text-align:center}
+  .err{color:var(--red);font-size:15px;margin-top:10px;text-align:center;min-height:20px}
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+  .step{background:#fbf6e7;border:1px solid var(--line);padding:16px 12px;text-align:center}
+  .step .n{font-family:"Playfair Display",serif;font-size:30px;color:var(--red)}
+  .step p{margin:6px 0 0;font-size:16px}
+  /* trust / testimonials */
+  .sectitle{font-family:"Playfair Display",serif;font-size:24px;text-align:center;margin:34px 0 4px}
+  .sectitle+.small{text-align:center;color:var(--ink-soft);font-style:italic;margin:0 0 12px}
+  .quotes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .quote{background:#fbf6e7;border:1px solid var(--line);padding:16px 18px}
+  .quote p{margin:0 0 8px;font-style:italic}
+  .quote .who{font-family:"Special Elite",monospace;font-size:12px;color:var(--ink-soft);letter-spacing:.06em}
+  .stars{color:var(--gold);letter-spacing:2px}
+  .faq{margin-top:8px}
+  .faq details{background:#fbf6e7;border:1px solid var(--line);padding:12px 16px;margin:8px 0}
+  .faq summary{cursor:pointer;font-weight:600;color:var(--navy)}
+  .faq p{margin:8px 0 0;font-size:17px}
+  /* result */
+  #result{display:none}
+  .eyebrow{font-family:"Special Elite",monospace;letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:var(--red);margin:0 0 4px}
+  .eyebrow.c{text-align:center}
+  .lema{font-family:"Playfair Display",serif;font-style:italic;font-size:clamp(20px,4vw,28px);text-align:center;color:var(--navy);margin:6px 0 4px}
+  .signo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+  .stat{background:#fbf6e7;border:1px solid var(--line);text-align:center;padding:14px 6px}
+  .stat .big{font-family:"Playfair Display",serif;font-size:22px;line-height:1.12}
+  .stat .lbl{font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+  .prose p{margin:12px 0}.prose .lead{font-size:21px}
+  .drop{font-family:"Playfair Display",serif;float:left;font-size:56px;line-height:.78;padding:6px 10px 0 0;color:var(--red)}
+  .sec{margin-top:26px}.sec h3{font-family:"Playfair Display",serif;font-size:22px;margin:0 0 8px}
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .listbox{background:#fbf6e7;border:1px solid var(--line);padding:14px 16px}
+  .listbox .li{margin:10px 0}.listbox .li b{color:var(--navy)}
+  .why{font-style:italic;color:var(--ink-soft);font-size:16px}
+  .luck{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center}
+  .luck .stat .big{font-size:18px}
+  .tarot{display:flex;gap:16px;align-items:center;background:#fbf6e7;border:1px solid var(--line);padding:16px}
+  .tarot .card-ico{font-size:44px;color:var(--gold)}
+  /* curiosity gap */
+  .locked{margin-top:24px;border-top:3px double var(--ink);padding-top:20px}
+  .locked-h{text-align:center;font-family:"Playfair Display",serif;font-size:26px;margin:0 0 4px}
+  .locked-sub{text-align:center;color:var(--ink-soft);font-style:italic;margin:0 0 16px}
+  .reveal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .reveal{background:#fbf6e7;border:1px solid var(--line);padding:14px 16px;position:relative;overflow:hidden}
+  .reveal .lbl{font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--red)}
+  .reveal .val{font-family:"Playfair Display",serif;font-size:19px;color:var(--navy);letter-spacing:.06em;margin-top:4px;filter:blur(.4px)}
+  .reveal .lock{position:absolute;top:12px;right:14px;opacity:.5}
+  .gate{background:linear-gradient(180deg,#f7edd2,#efe0be);border:2px solid var(--gold);text-align:center;padding:28px 22px;margin-top:20px;box-shadow:0 10px 34px rgba(60,45,20,.16)}
+  .gate .stack{text-align:left;max-width:440px;margin:0 auto 16px}
+  .gate .stack div{margin:7px 0;font-size:17px}
+  .gate .stack .ck{color:var(--green);font-weight:700;margin-right:6px}
+  .flag{display:inline-block;background:var(--red);color:#f4ecd8;font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:5px 12px;margin-bottom:12px}
+  .price{font-family:"Playfair Display",serif;font-size:52px;color:var(--red);line-height:1}
+  .price small{font-size:18px;color:var(--ink-soft);font-style:italic}
+  .anchor{color:var(--ink-soft);font-style:italic;font-size:15px;margin:2px 0 12px}
+  .pay-opts{display:flex;gap:12px;margin-top:6px}
+  .pay-opts .btn{margin-top:0}
+  .badges{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--ink-soft)}
+  .risk{margin-top:12px;font-style:italic;color:var(--green);font-size:15px}
+  /* upsell */
+  .upsell{background:#241c15;color:#f4ecd8;border:1px solid var(--gold);padding:30px 24px;margin-top:26px;text-align:center}
+  .upsell .flag{background:var(--gold);color:#241d10}
+  .upsell h3{font-family:"Playfair Display",serif;color:#f2d78a;font-size:30px;margin:6px 0}
+  .upsell .old{text-decoration:line-through;opacity:.55}
+  .upsell .new{font-family:"Playfair Display",serif;font-size:46px;color:#f2d78a}
+  .coupon{display:inline-block;border:2px dashed var(--gold);color:#f2d78a;font-family:"Special Elite",monospace;letter-spacing:.14em;padding:8px 16px;margin:8px 0}
+  .timer{font-family:"Special Elite",monospace;color:#e8b4a0;letter-spacing:.08em}
+  .foot{text-align:center;color:var(--ink-soft);font-size:13px;font-style:italic;margin-top:44px}
+  /* ====== CAMADA GRÁFICA ====== */
+  .hero-orn{display:block;width:min(100%,620px);margin:-6px auto -18px;opacity:.9;pointer-events:none}
+  .orn-divider{display:block;width:min(78%,420px);margin:26px auto;opacity:.42;pointer-events:none}
+  .orn-divider.small{width:min(52%,260px);opacity:.32;margin:18px auto}
+  .zodiac-bg{position:relative;overflow:hidden}
+  .zodiac-bg::before{content:"";position:absolute;inset:0;background:url("img/roda-zodiaco.jpg") center/cover no-repeat;
+    opacity:.16;mix-blend-mode:multiply;pointer-events:none}
+  .zodiac-bg>*{position:relative}
+  .selo{display:block;width:110px;height:auto;margin:0 auto}
+  .selo.lg{width:150px}
+  .selo-wrap{text-align:center;margin:18px 0 6px}
+  .selo-cap{font-family:"Special Elite",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-top:6px}
+  .tarot-art{width:100%;height:auto;display:block;border:1px solid var(--line);margin-bottom:12px}
+  /* prova / arquétipo revelado */
+  .arq-reveal{background:linear-gradient(180deg,#f9f0d8,#efe0be);border:2px solid var(--gold);text-align:center;padding:26px 20px;margin:6px 0 4px;
+    box-shadow:0 10px 30px rgba(60,45,20,.14)}
+  .arq-reveal .lbl{font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--red)}
+  .arq-reveal .nome{font-family:"Playfair Display",serif;font-size:clamp(30px,7vw,46px);color:var(--navy);line-height:1.05;margin:8px 0 4px}
+  .arq-reveal .lema{font-style:italic;font-size:clamp(17px,3.4vw,21px);color:var(--ink-soft);margin:0}
+  .barnum{background:#fbf6e7;border-left:4px solid var(--red);padding:14px 18px;margin:16px 0 4px;font-style:italic;font-size:19px}
+  .barnum .tag{display:block;font-family:"Special Elite",monospace;font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+  /* ancoragem de preço */
+  .anchor-stack{margin:0 auto 10px;max-width:420px}
+  .anchor-stack .hi{font-size:16px;color:var(--ink-soft);text-decoration:line-through;opacity:.8}
+  .anchor-stack .hi b{text-decoration:line-through}
+  .guarantee{background:#fbf6e7;border:1px dashed var(--green);color:var(--ink);padding:12px 16px;margin-top:14px;font-size:16px;text-align:center}
+  .guarantee b{color:var(--green)}
+  .urgency{background:var(--navy);color:#f4ecd8;text-align:center;font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;padding:9px 14px;margin:0 0 6px}
+  /* uf inline pós-desbloqueio */
+  .uf-ask{background:#fbf6e7;border:1px solid var(--line);padding:14px 16px;margin:16px 0;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+  .uf-ask .field{flex:1;min-width:180px;margin:0}
+  .uf-ask button{width:auto;padding:13px 22px;margin:0;flex:0 0 auto}
+  /* card compartilhável */
+  .share-box{background:#fbf6e7;border:2px solid var(--gold);padding:20px;margin-top:22px;text-align:center}
+  .share-box h3{font-family:"Playfair Display",serif;font-size:24px;margin:0 0 4px}
+  .share-box p{margin:4px 0 14px;color:var(--ink-soft);font-style:italic;font-size:16px}
+  #shareCanvas{display:none}
+  #sharePreview{width:min(100%,300px);height:auto;border:1px solid var(--line);margin:0 auto 14px;display:none;box-shadow:0 8px 24px rgba(60,45,20,.18)}
+  .share-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .share-actions .btn{width:auto;flex:1 1 190px;margin-top:0}
+  .date3{display:flex;gap:10px}
+  .date3 select{padding:13px 8px}
+  @media (max-width:560px){.signo-grid,.steps{grid-template-columns:1fr}.twocol,.quotes,.reveal-grid{grid-template-columns:1fr}.luck{grid-template-columns:1fr 1fr}.pay-opts{flex-direction:column}
+    .hero-orn{margin:-4px auto -10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= LANDING ================= -->
+  <div id="landing">
+    <header class="masthead">
+      <div class="kicker">Astrologia · Numerologia · Zodíaco Chinês</div>
+      <hr class="rule double"/>
+      <img class="hero-orn" src="img/ornamento-heroi.png" alt="" aria-hidden="true"/>
+      <h1 class="title">Descubra quem você<br/>realmente é</h1>
+      <div class="fleuron">✦ ❧ ✦</div>
+      <p class="subtitle">Em 30 segundos, a partir do seu nome e do dia em que você chegou ao mundo. <strong>Mapa da Alma</strong>.</p>
+      <div class="hero-benefits"><span>⚡ Pronto na hora</span><span>🎁 Prévia grátis</span><span>📄 PDF pra guardar</span></div>
+      <hr class="rule"/>
+    </header>
+
+    <div class="urgency" id="urgencyBar">Oferta de lançamento — o mapa completo por R$ 9,99</div>
+
+    <section class="card zodiac-bg" id="formCard">
+      <h2>Sua prévia é grátis</h2>
+      <p style="margin:0 0 10px;color:var(--ink-soft);font-style:italic">Duas informações e o seu retrato começa a aparecer na tela. Você só paga se quiser o mapa completo.</p>
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input id="nome" type="text" placeholder="Ex.: Maria Aparecida de Souza" autocomplete="name"/>
+      </div>
+      <div class="field">
+        <label for="dia">Data de nascimento</label>
+        <div class="date3">
+          <select id="dia" aria-label="Dia"><option value="">Dia</option></select>
+          <select id="mes" aria-label="Mês"><option value="">Mês</option></select>
+          <select id="ano" aria-label="Ano"><option value="">Ano</option></select>
+        </div>
+      </div>
+      <button class="btn red big" id="gerar">✦ Revelar meu Mapa da Alma</button>
+      <div class="err" id="erro"></div>
+      <p class="hint">Sem cadastro, sem e-mail. A prévia aparece na hora.</p>
+    </section>
+
+    <div class="steps">
+      <div class="step"><div class="n">1</div><p>Diga seu nome e o dia em que você nasceu</p></div>
+      <div class="step"><div class="n">2</div><p>Veja de graça o que os astros já revelam</p></div>
+      <div class="step"><div class="n">3</div><p>Destrave o retrato inteiro e leve o PDF</p></div>
+    </div>
+
+    <img class="orn-divider" src="img/ornamento-heroi.png" alt="" aria-hidden="true"/>
+
+    <!-- =================================================================
+         ATENÇÃO: DEPOIMENTOS DE EXEMPLO.
+         Substitua pelos depoimentos REAIS dos seus primeiros clientes
+         antes de publicar. Publicar depoimento inventado é propaganda
+         enganosa (CDC art. 37) e queima a marca no primeiro print.
+         Enquanto não tiver depoimento real, APAGUE este bloco inteiro —
+         a prova social de identificação abaixo segura sozinha.
+         ================================================================= -->
+    <h3 class="sectitle">O que as pessoas dizem</h3>
+    <p class="small">⚠️ Depoimentos de exemplo — troque pelos reais (ou apague o bloco) antes de publicar.</p>
+    <div class="quotes">
+      <div class="quote"><div class="stars">★★★★★</div><p>“Meu personagem deu <em>Capitu</em> e eu travei. É exatamente como me sinto: todo mundo sempre me lê como um mistério. Mandei pro meu namorado chorando.”</p><div class="who">— Fernanda, Belo Horizonte</div></div>
+      <div class="quote"><div class="stars">★★★★★</div><p>“A parte da kryptonita me pegou: ‘ouvir tanto quanto você fala’. Minha esposa leu por cima do meu ombro e riu alto. Mandei pro grupo da família e três já fizeram o deles.”</p><div class="who">— Ricardo, Curitiba</div></div>
+    </div>
+    <p class="hint">Aquarianos, leoninos, cancerianos — cada signo descobre uma coisa diferente sobre si aqui.</p>
+
+    <h3 class="sectitle">Perguntas rápidas</h3>
+    <div class="faq">
+      <details><summary>Como recebo meu mapa?</summary><p>Na hora. Depois do pagamento você destrava tudo na tela e baixa um PDF caprichado para guardar, imprimir ou presentear.</p></details>
+      <details><summary>Em que isso é baseado?</summary><p>No seu signo solar, no seu zodíaco chinês (animal e elemento) e na numerologia do seu nome e da sua data — tudo calculado a partir do que você preenche.</p></details>
+      <details><summary>Serve de presente?</summary><p>Perfeitamente. É um presente que emociona e custa menos que um lanche. O PDF fica pronto para enviar ou imprimir.</p></details>
+      <details><summary>O pagamento é seguro?</summary><p>Sim. Você paga com Pix ou cartão à vista, por um ambiente de pagamento seguro.</p></details>
+    </div>
+  </div>
+
+  <!-- ================= RESULT ================= -->
+  <section id="result">
+    <div class="card zodiac-bg">
+      <div class="eyebrow c">O Mapa da Alma de</div>
+      <h1 class="title" style="font-size:clamp(26px,6vw,44px);text-align:center" id="rName">—</h1>
+      <img class="orn-divider small" src="img/ornamento-heroi.png" alt="" aria-hidden="true"/>
+      <hr class="rule"/>
+      <div class="signo-grid">
+        <div class="stat"><div class="big" id="rSigno">—</div><div class="lbl">Signo Solar</div></div>
+        <div class="stat"><div class="big" id="rChines">—</div><div class="lbl">Zodíaco Chinês</div></div>
+        <div class="stat"><div class="big" id="rCaminho">—</div><div class="lbl">Caminho de Vida</div></div>
+      </div>
+      <div class="prose"><p class="lead" id="rTeaser">—</p></div>
+
+      <div class="barnum" id="rBarnum"><span class="tag">O que os seus números entregam de você</span><span id="rBarnumTxt">—</span></div>
+
+      <!-- CURIOSITY GAP -->
+      <div class="locked" id="lockedZone">
+        <div class="locked-h" id="lockedH">Seu arquétipo já foi calculado. Ele está logo ali.</div>
+        <div class="locked-sub">De todos os doze, os seus astros apontaram exatamente um — e ele explica coisas que você nunca soube nomear.</div>
+        <div class="reveal-grid" id="revealGrid"></div>
+
+        <div class="gate">
+          <div class="flag">Oferta de lançamento</div>
+          <div class="stack">
+            <div><span class="ck">✓</span> <strong>Seu arquétipo</strong> — qual dos doze você é, e o lema que rege a sua vida</div>
+            <div><span class="ck">✓</span> O personagem da ficção brasileira que é a sua cara</div>
+            <div><span class="ck">✓</span> O filme, o livro, a série, a novela e a música da sua vida</div>
+            <div><span class="ck">✓</span> Sua leitura de personalidade completa — forças e sombras</div>
+            <div><span class="ck">✓</span> Seu superpoder, sua kryptonita e seu par ideal</div>
+            <div><span class="ck">✓</span> Profissões em que você brilha · sua carta do Tarô · sua época</div>
+            <div><span class="ck">✓</span> O significado do seu sobrenome + PDF pra guardar</div>
+          </div>
+          <div class="anchor-stack">
+            <div class="hi">Uma leitura de mapa astral com astrólogo: <b>R$ 150 ou mais</b></div>
+          </div>
+          <div class="price">R$ 9,99 <small>à vista</small></div>
+          <div class="anchor">menos que um lanche — e é sobre a coisa mais interessante do mundo: você.</div>
+          <div class="pay-opts">
+            <button class="btn" id="payPix">Pagar com Pix</button>
+            <button class="btn red" id="payCard">Cartão à vista</button>
+          </div>
+          <div class="guarantee">🛡️ <b>Não se identificou com o seu mapa? Devolvemos o seu dinheiro.</b><br/>Basta responder o e-mail da compra. Sem pergunta, sem formulário.</div>
+          <div class="risk">🎁 Você já viu sua prévia de graça. Só paga se quiser o resto.</div>
+          <div class="badges"><span>🔒 Pagamento seguro</span><span>⚡ Entrega na hora</span><span>📄 PDF pra sempre</span></div>
+          <p class="hint" id="demoNote">Modo demonstração: os botões liberam o conteúdo para você testar.</p>
+        </div>
+      </div>
+
+      <!-- UNLOCKED -->
+      <div id="unlocked" style="display:none">
+        <hr class="rule double"/>
+
+        <div class="arq-reveal">
+          <div class="lbl">Entre os doze, você é</div>
+          <div class="nome" id="uArqNome">—</div>
+          <p class="lema" id="uArqLema">—</p>
+        </div>
+        <div class="selo-wrap">
+          <img class="selo lg" src="img/selo.png" alt="Selo do Mapa da Alma"/>
+          <div class="selo-cap">Mapa autenticado · Mapa da Alma</div>
+        </div>
+
+        <div class="uf-ask" id="ufAsk">
+          <div class="field">
+            <label for="uf">Falta um detalhe: em que estado você nasceu?</label>
+            <select id="uf"><option value="">Selecione…</option></select>
+          </div>
+          <button class="btn" id="ufOk">Completar</button>
+        </div>
+
+        <div class="sec"><div class="eyebrow">Quem você é</div><div class="prose" id="fullProfile"></div></div>
+        <div class="sec"><h3>✦ Você seria…</h3>
+          <h2 style="font-family:'Playfair Display',serif;text-align:center;font-size:30px;margin:6px 0" id="charName"></h2>
+          <div class="prose"><p id="charText" style="text-align:center;font-style:italic"></p></div></div>
+        <div class="sec"><h3>✦ As histórias que são a sua vida</h3><div class="listbox" id="midia"></div></div>
+        <div class="sec"><h3>✦ Profissões em que você prospera</h3><div class="listbox" id="profOk"></div></div>
+        <div class="sec"><h3>✦ Onde sua energia rema contra a maré</h3><div class="listbox" id="profNo"></div></div>
+        <div class="sec"><h3>✦ A carta que te rege</h3>
+          <img class="tarot-art" loading="lazy" decoding="async" src="img/carta-tarot.jpg" alt="Ilustração de carta do Tarô"/>
+          <div class="tarot"><div class="card-ico">🂠</div><div><b id="tarotName" style="font-family:'Playfair Display',serif;font-size:22px"></b><div class="why" id="tarotWhy"></div></div></div></div>
+        <div class="sec"><h3>✦ A época em que você teria brilhado</h3><div class="prose" id="epoca"></div></div>
+        <div class="sec"><h3>✦ Seu superpoder & sua kryptonita</h3><div class="twocol">
+          <div class="listbox"><div class="eyebrow">Superpoder</div><p id="superP" style="margin:6px 0 0"></p></div>
+          <div class="listbox"><div class="eyebrow">Kryptonita</div><p id="krypP" style="margin:6px 0 0"></p></div></div></div>
+        <div class="sec"><h3>✦ Seu par ideal</h3><div class="prose" id="par"></div></div>
+        <div class="sec" id="secSobre"><h3>✦ O significado do seu sobrenome</h3><div class="prose" id="sobrenome"></div></div>
+        <div class="sec"><h3>✦ Cor, número, dia & pedra da sorte</h3><div class="luck">
+          <div class="stat"><div class="big" id="luckCor"></div><div class="lbl">Cor</div></div>
+          <div class="stat"><div class="big" id="luckNum"></div><div class="lbl">Número</div></div>
+          <div class="stat"><div class="big" id="luckDia"></div><div class="lbl">Dia</div></div>
+          <div class="stat"><div class="big" id="luckPedra"></div><div class="lbl">Pedra</div></div></div></div>
+        <div class="sec"><h3>✦ A cor da sua época</h3><div class="prose" id="nostalgia"></div></div>
+
+        <button class="btn red big" id="baixar" style="margin-top:20px">⤓ Baixar meu PDF</button>
+
+        <!-- CARD COMPARTILHÁVEL -->
+        <div class="share-box">
+          <h3>Mostre o seu arquétipo</h3>
+          <p>Um card pronto pro story. Cada pessoa que vir o seu vai querer saber o dela.</p>
+          <img id="sharePreview" alt="Prévia do card do seu Mapa da Alma"/>
+          <canvas id="shareCanvas" width="1080" height="1350"></canvas>
+          <div class="share-actions">
+            <button class="btn gold" id="shareBtn">✦ Compartilhar meu Mapa</button>
+            <button class="btn ghost" id="shareDl">⤓ Baixar a imagem</button>
+          </div>
+          <p class="hint" id="shareHint">O card sai com o seu arquétipo, o seu lema e o seu signo.</p>
+        </div>
+
+        <!-- UPSELL: Almanaque Minha História -->
+        <div class="upsell">
+          <div class="flag">Só para quem já é cliente</div>
+          <h3>Almanaque Minha História</h3>
+          <p style="margin:4px 0 12px;opacity:.92">Você acabou de descobrir <em>quem é</em>. Agora imagine receber a sua <strong>vida inteira contada assim</strong>: o dia exato em que você nasceu, a sua infância, a sua adolescência e o Brasil de cada uma dessas épocas — pesquisado à mão, adaptado à sua região, entregue como uma peça de acervo em <strong>3 dias úteis</strong>.</p>
+          <p style="margin:0 0 10px;opacity:.85;font-style:italic">Seus R$ 9,99 já valeram: eles viram R$ 15 de desconto aqui.</p>
+          <p><span class="old">R$ 60,00</span> &nbsp; <span class="new">R$ 45,00</span></p>
+          <div class="coupon" id="couponBox">CUPOM ————</div>
+          <p class="timer" id="timerBox"></p>
+          <button class="btn gold big" id="buyPremium">Quero a minha história inteira</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn ghost" id="reset">Fazer outro Mapa da Alma</button>
+  </section>
+
+  <p class="foot">Mapa da Alma · gerado no seu navegador · uma peça de entretenimento místico e nostálgico.</p>
+</div>
+
+<script>
+/* ==================================================================
+   CONFIG — pagamento e upsell
+   ================================================================== */
+const CONFIG = {
+  DEMO_MODE: true,          // false em produção
+  PRICE: "9,99",
+  PIX_URL: "",              // checkout Pix do Mapa da Alma (R$9,99)
+  CARD_URL: "",             // checkout cartão à vista do Mapa da Alma (R$9,99)
+  PREMIUM_URL: "",          // checkout do Almanaque Minha História (R$45 c/ cupom) — recebe ?cupom=
+  COUPON_MINUTES: 30,       // validade do desconto de R$15
+  COUPON_PREFIX: "ALMA15",
+  SITE_URL: "mapadaalma.com.br",   // aparece no card compartilhável
+  // ATENÇÃO: só deixe true se a oferta de lançamento for REAL (o preço
+  // realmente vai subir depois). Urgência falsa queima a marca.
+  LAUNCH_URGENCY: true,
+  LAUNCH_TEXT: "Oferta de lançamento — o mapa completo por R$ 9,99"
+};
+
+/* ============================ MOTOR ============================ */
+function stripAccents(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ç/gi,'c');}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
+function redact(s){return String(s).replace(/[A-Za-zÀ-ÿ0-9]/g,'█');}
+
+const ZODIAC=[['Capricórnio',1,1,1,19],['Aquário',1,20,2,18],['Peixes',2,19,3,20],['Áries',3,21,4,19],['Touro',4,20,5,20],['Gêmeos',5,21,6,20],['Câncer',6,21,7,22],['Leão',7,23,8,22],['Virgem',8,23,9,22],['Libra',9,23,10,22],['Escorpião',10,23,11,21],['Sagitário',11,22,12,21],['Capricórnio',12,22,12,31]];
+function zodiac(m,d){for(const[n,m1,d1,m2,d2]of ZODIAC){if((m===m1&&d>=d1)||(m===m2&&d<=d2))return n;}return'—';}
+const CNY={1940:'02-08',1941:'01-27',1942:'02-15',1943:'02-05',1944:'01-25',1945:'02-13',1946:'02-02',1947:'01-22',1948:'02-10',1949:'01-29',1950:'02-17',1951:'02-06',1952:'01-27',1953:'02-14',1954:'02-03',1955:'01-24',1956:'02-12',1957:'01-31',1958:'02-18',1959:'02-08',1960:'01-28',1961:'02-15',1962:'02-05',1963:'01-25',1964:'02-13',1965:'02-02',1966:'01-21',1967:'02-09',1968:'01-30',1969:'02-17',1970:'02-06',1971:'01-27',1972:'02-15',1973:'02-03',1974:'01-23',1975:'02-11',1976:'01-31',1977:'02-18',1978:'02-07',1979:'01-28',1980:'02-16',1981:'02-05',1982:'01-25',1983:'02-13',1984:'02-02',1985:'02-20',1986:'02-09',1987:'01-29',1988:'02-17',1989:'02-06',1990:'01-27',1991:'02-15',1992:'02-04',1993:'01-23',1994:'02-10',1995:'01-31',1996:'02-19',1997:'02-07',1998:'01-28',1999:'02-16',2000:'02-05',2001:'01-24',2002:'02-12',2003:'02-01',2004:'01-22',2005:'02-09',2006:'01-29',2007:'02-18',2008:'02-07',2009:'01-26',2010:'02-14',2011:'02-03',2012:'01-23'};
+const ANIMAL_BASE=['Cão','Porco','Rato','Boi','Tigre','Coelho','Dragão','Serpente','Cavalo','Cabra','Macaco','Galo'];
+function chineseYear(y,m,d){const c=CNY[y];if(c){const[cm,cd]=c.split('-').map(Number);if(m<cm||(m===cm&&d<cd))return y-1;}return y;}
+function chineseAnimal(y,m,d){return ANIMAL_BASE[((chineseYear(y,m,d)-1970)%12+12)%12];}
+function chineseElement(y,m,d){const l=((chineseYear(y,m,d)%10)+10)%10;return l<=1?'Metal':l<=3?'Água':l<=5?'Madeira':l<=7?'Fogo':'Terra';}
+function reduce(n){while(n>9&&n!==11&&n!==22&&n!==33){n=String(n).split('').reduce((a,b)=>a+ +b,0);}return n;}
+function lifePath(y,m,d){return reduce(reduce(m)+reduce(d)+reduce(String(y).split('').reduce((a,b)=>a+ +b,0)));}
+const PYTH={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+function expression(nm){const c=stripAccents(nm).toUpperCase().replace(/[^A-Z]/g,'');let s=0;for(const ch of c)s+=PYTH[ch]||0;return reduce(s);}
+function ageAt(y,m,d){const t=new Date();let a=t.getFullYear()-y;if(t.getMonth()+1<m||(t.getMonth()+1===m&&t.getDate()<d))a--;return a;}
+function seedNum(c){let h=2166136261>>>0;const s=(c.nome+'|'+c.y+'|'+c.m+'|'+c.d).toLowerCase();for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+function shuffleSeeded(arr,seed){const a=arr.slice();let s=(seed>>>0)||1;for(let i=a.length-1;i>0;i--){s=(Math.imul(s,1103515245)+12345)>>>0;const j=s%(i+1);const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ===================== DADOS ===================== */
+const SIGNO={
+ 'Áries':{tags:['coragem','lideranca','acao','impeto'],cor:'Vermelho',dia:'Terça',pedra:'Rubi',desc:'pioneiro de sangue quente: você abre caminho onde outros hesitam, movido por um fogo que não sabe recuar.'},
+ 'Touro':{tags:['disciplina','tradicao','sensualidade','resiliencia'],cor:'Verde',dia:'Sexta',pedra:'Esmeralda',desc:'raiz firme e sentidos abertos: constrói devagar, gosta do que é bom e não larga o osso quando decide.'},
+ 'Gêmeos':{tags:['palavra','curiosidade','versatilidade','carisma'],cor:'Amarelo',dia:'Quarta',pedra:'Ágata',desc:'mente de mil janelas: curioso, falante, capaz de ser dois em um só — eterno tradutor do mundo.'},
+ 'Câncer':{tags:['cuidado','sensibilidade','intuicao','familia'],cor:'Prata',dia:'Segunda',pedra:'Pérola',desc:'coração de casa: sua força mora no afeto, na memória e na lealdade a quem você abraça como seu.'},
+ 'Leão':{tags:['palco','lideranca','carisma','poder'],cor:'Dourado',dia:'Domingo',pedra:'Âmbar',desc:'brilho de palco: nasceu para ser visto e para aquecer os outros com sua generosidade de sol.'},
+ 'Virgem':{tags:['analise','disciplina','servico','precisao'],cor:'Bege',dia:'Quarta',pedra:'Safira',desc:'artesão do detalhe: enxerga o que passa despercebido e transforma cuidado em forma de amor.'},
+ 'Libra':{tags:['harmonia','arte','justica','carisma'],cor:'Rosa',dia:'Sexta',pedra:'Quartzo rosa',desc:'fiel da balança: busca a beleza e o acordo, e desarma tempestades só pela presença elegante.'},
+ 'Escorpião':{tags:['intensidade','misterio','estrategia','poder'],cor:'Vinho',dia:'Terça',pedra:'Topázio',desc:'águas fundas: intenso, magnético, sente tudo em dobro e renasce das próprias cinzas.'},
+ 'Sagitário':{tags:['aventura','liberdade','filosofia','otimismo'],cor:'Roxo',dia:'Quinta',pedra:'Turquesa',desc:'flecha lançada ao horizonte: aventureiro e filósofo, sua casa é a estrada e sua fé é o novo.'},
+ 'Capricórnio':{tags:['disciplina','poder','ambicao','resiliencia'],cor:'Marrom',dia:'Sábado',pedra:'Ônix',desc:'montanha paciente: ambição de aço e pés no chão, chega ao topo pelo trabalho, não pela sorte.'},
+ 'Aquário':{tags:['inovacao','liberdade','visao','rebeldia'],cor:'Azul-turquesa',dia:'Sábado',pedra:'Ametista',desc:'mente à frente do relógio: original e livre, enxerga o amanhã enquanto os outros discutem o ontem.'},
+ 'Peixes':{tags:['sensibilidade','arte','intuicao','sonho'],cor:'Verde-mar',dia:'Quinta',pedra:'Água-marinha',desc:'sonhador de olhos molhados: sensível como poucos, traduz o invisível em arte, fé e compaixão.'}
+};
+const NUM={
+ 1:{tags:['lideranca','independencia','acao'],desc:'O 1 é a força da liderança e do começo — você veio para abrir portas por conta própria.'},
+ 2:{tags:['diplomacia','sensibilidade','harmonia'],desc:'O 2 é a delicadeza que une — você é a ponte, quem sente o clima antes de todos e costura a paz.'},
+ 3:{tags:['palavra','arte','carisma'],desc:'O 3 é a alegria que se expressa — comunicação, criatividade e um charme que ilumina qualquer roda.'},
+ 4:{tags:['disciplina','tradicao','resiliencia'],desc:'O 4 é o alicerce — disciplina, honestidade e trabalho; a pessoa em quem todos apoiam a casa.'},
+ 5:{tags:['liberdade','aventura','versatilidade'],desc:'O 5 é o vento da liberdade — mudança, viagem e aventura; prender você é prender o horizonte.'},
+ 6:{tags:['cuidado','familia','servico'],desc:'O 6 é o amor que cuida — responsável e caloroso, você faz do lar um reino.'},
+ 7:{tags:['analise','misterio','filosofia'],desc:'O 7 é o buscador — introspecção, sabedoria e sede de entender o que há por trás das coisas.'},
+ 8:{tags:['poder','ambicao','justica'],desc:'O 8 é o poder que realiza — ambição, justiça e faro para o material; nasceu para construir e reger.'},
+ 9:{tags:['generosidade','arte','sensibilidade'],desc:'O 9 é o coração do mundo — generosidade, arte e uma alma que ama a humanidade inteira.'},
+ 11:{tags:['visao','intuicao','inspiracao'],desc:'O 11 é o número mestre da inspiração — intuição fora do comum e a missão de iluminar.'},
+ 22:{tags:['visao','poder','disciplina'],desc:'O 22 é o mestre construtor — sonha grande e tem mãos para erguer o que sonhou.'},
+ 33:{tags:['cuidado','servico','inspiracao'],desc:'O 33 é o mestre do amor incondicional — cura, ensino e entrega; uma das vibrações mais raras.'}
+};
+const ANIMAL={
+ 'Rato':{tags:['esperteza','estrategia','sobrevivencia'],adj:'esperto e sobrevivente'},'Boi':{tags:['disciplina','resiliencia','tradicao'],adj:'firme e trabalhador'},'Tigre':{tags:['coragem','impeto','lideranca'],adj:'corajoso e magnético'},'Coelho':{tags:['diplomacia','sensibilidade','arte'],adj:'gentil e diplomático'},'Dragão':{tags:['poder','carisma','visao'],adj:'poderoso e visionário'},'Serpente':{tags:['misterio','estrategia','intuicao'],adj:'sábio e enigmático'},'Cavalo':{tags:['liberdade','acao','impeto'],adj:'livre e apaixonado'},'Cabra':{tags:['arte','sensibilidade','sonho'],adj:'sensível e criativo'},'Macaco':{tags:['curiosidade','versatilidade','palavra'],adj:'engenhoso e brincalhão'},'Galo':{tags:['precisao','franqueza','palco'],adj:'orgulhoso e franco'},'Cão':{tags:['justica','lealdade','servico'],adj:'leal e justo'},'Porco':{tags:['cuidado','generosidade','sinceridade'],adj:'generoso e sincero'}
+};
+const ELEM={'Metal':['disciplina','ambicao','resiliencia'],'Água':['intuicao','sensibilidade','versatilidade'],'Madeira':['crescimento','etica','cuidado'],'Fogo':['paixao','carisma','acao'],'Terra':['estabilidade','cuidado','tradicao']};
+const ARQ=[['O Soberano',['poder','lideranca','ambicao'],'Sonhar grande é o mínimo.'],['O Visionário',['visao','inovacao','rebeldia'],'O futuro chega mais rápido perto de você.'],['O Guerreiro',['coragem','acao','impeto'],'Recuar não está no vocabulário.'],['O Sábio',['analise','filosofia','misterio'],'Entender é a sua forma de vencer.'],['O Artista',['arte','sensibilidade','sonho'],'Você transforma sentimento em beleza.'],['O Comunicador',['palavra','carisma','palco'],'Quando você fala, a sala para.'],['O Guardião',['cuidado','familia','servico'],'Ao seu lado, o mundo parece mais seguro.'],['O Aventureiro',['aventura','liberdade','versatilidade'],'A estrada é o seu endereço.'],['O Estrategista',['estrategia','disciplina','misterio'],'Você ganha o jogo três lances antes.'],['O Diplomata',['diplomacia','harmonia','justica'],'Você desarma tempestades só de chegar.'],['O Construtor',['disciplina','resiliencia','tradicao'],'O que você levanta, fica de pé.'],['O Místico',['intuicao','inspiracao','sonho'],'Você sente a verdade antes de ela ser dita.']];
+const TAROT={1:['O Mago','o poder de transformar vontade em realidade'],2:['A Sacerdotisa','a sabedoria silenciosa que sabe sem precisar provar'],3:['A Imperatriz','a criação fértil, a beleza e a abundância'],4:['O Imperador','a autoridade que estrutura e comanda'],5:['O Hierofante','a busca por sentido e por tradição'],6:['Os Enamorados','as escolhas do coração e as grandes alianças'],7:['O Carro','a vitória pela vontade e pelo movimento'],8:['A Força','a coragem serena que domina pela mansidão, não pela violência'],9:['O Eremita','a luz interior de quem busca a verdade sozinho'],11:['A Justiça','o equilíbrio, a verdade e o peso justo das coisas'],22:['O Louco','a liberdade absoluta de quem começa sempre de novo, sem medo do salto']};
+const PROF=[['Empreendedor(a) / fundador(a)',['ambicao','coragem','visao','lideranca']],['Advogado(a) / promotor(a)',['justica','palavra','estrategia','poder']],['Executivo(a) / CEO',['poder','lideranca','disciplina','ambicao']],['Publicidade / marketing',['palavra','carisma','inovacao','arte']],['Político(a) / líder de causa',['lideranca','visao','palavra','poder']],['Palestrante / criador(a) de conteúdo',['palco','palavra','carisma','visao']],['Médico(a) / enfermeiro(a)',['cuidado','servico','resiliencia','analise']],['Professor(a) / educador(a)',['servico','palavra','cuidado','filosofia']],['Psicólogo(a) / terapeuta',['intuicao','sensibilidade','analise','cuidado']],['Artista / músico(a)',['arte','sensibilidade','palco','sonho']],['Escritor(a) / roteirista',['palavra','arte','sonho','analise']],['Designer / arquiteto(a)',['arte','precisao','disciplina','visao']],['Cientista / pesquisador(a)',['analise','filosofia','precisao','curiosidade']],['Engenheiro(a)',['disciplina','precisao','analise','resiliencia']],['Militar / segurança',['coragem','disciplina','justica','lealdade']],['Chef / gastronomia',['arte','sensualidade','disciplina','cuidado']],['Diplomata / mediador(a) / RH',['diplomacia','harmonia','justica','palavra']],['Explorador(a) / guia de turismo',['aventura','liberdade','coragem','versatilidade']],['Investidor(a) / mercado financeiro',['ambicao','estrategia','analise','poder']],['Jornalista',['palavra','curiosidade','justica','coragem']],['Ator / atriz',['palco','carisma','arte','sensibilidade']],['Vendedor(a) / negociador(a)',['palavra','carisma','estrategia','resiliencia']],['Líder espiritual / coach',['inspiracao','intuicao','servico','palavra']],['Administrador(a) / contador(a)',['disciplina','precisao','tradicao','analise']]];
+const EVITA={liberdade:'funções de rotina rígida e horário travado — te prendem onde você precisa de espaço',aventura:'trabalhos parados, sem movimento nem novidade — o tédio te cansa antes do esforço',palco:'o bastidor anônimo, sem reconhecimento — você rende quando é visto',carisma:'papéis de isolamento, longe de gente — sua energia vem do contato',inovacao:'a burocracia do "sempre foi assim" — pedir que você não invente é pedir que não respire',rebeldia:'hierarquias engessadas que sufocam sua voz',poder:'a subordinação sem autonomia — mandar em nada te adoece',lideranca:'ficar eternamente executando ordens dos outros',arte:'ambientes frios e mecânicos, sem espaço para beleza',sensibilidade:'rotinas duras e impessoais que ignoram o lado humano',acao:'processos lentos e intermináveis — você quer resolver, não arrastar',impeto:'trabalhos que exigem esperar meses por um resultado',disciplina:'ambientes caóticos, sem regra nem previsibilidade',analise:'decisões no chute, sem tempo de pensar',intuicao:'funções puramente mecânicas que ignoram o seu faro'};
+const MIDIA={
+ filme:[['O Poderoso Chefão',['poder','estrategia','lealdade','ambicao']],['Cidadão Kane',['ambicao','poder','visao','misterio']],['O Senhor dos Anéis',['aventura','coragem','lealdade','sonho']],['Clube da Luta',['rebeldia','inovacao','intensidade']],['A Vida é Bela',['sensibilidade','otimismo','familia','resiliencia']],['Gladiador',['coragem','justica','poder','resiliencia']],['O Fabuloso Destino de Amélie Poulain',['arte','sonho','sensibilidade','intuicao']],['O Lobo de Wall Street',['ambicao','carisma','poder']],['Forrest Gump',['sinceridade','resiliencia','sonho','servico']],['Matrix',['visao','rebeldia','filosofia','inovacao']],['Coringa',['intensidade','rebeldia','arte','misterio']],['O Rei Leão',['lideranca','coragem','familia','poder']],['Comer Rezar Amar',['aventura','liberdade','sensibilidade','sonho']],['Rocky, Um Lutador',['resiliencia','coragem','disciplina']],['Interestelar',['visao','filosofia','coragem','sonho']],['O Discurso do Rei',['resiliencia','disciplina','palavra','servico']],['Uma Mente Brilhante',['analise','filosofia','resiliencia','misterio']],['Central do Brasil',['cuidado','sensibilidade','servico','resiliencia']]],
+ livro:[['O Conde de Monte Cristo',['estrategia','justica','resiliencia','poder']],['Dom Casmurro',['misterio','arte','intensidade']],['Cem Anos de Solidão',['sonho','arte','familia','misterio']],['Grande Sertão: Veredas',['aventura','filosofia','coragem']],['O Pequeno Príncipe',['sensibilidade','sonho','filosofia','arte']],['1984',['visao','rebeldia','justica','intensidade']],['O Alquimista',['aventura','sonho','liberdade','inspiracao']],['A Arte da Guerra',['estrategia','disciplina','poder','analise']],['Orgulho e Preconceito',['palavra','carisma','harmonia','arte']],['Capitães da Areia',['coragem','lideranca','justica','resiliencia']],['Vidas Secas',['resiliencia','servico','disciplina']],['O Nome da Rosa',['analise','misterio','filosofia']],['A Hora da Estrela',['sensibilidade','sonho','arte']],['O Cortiço',['sensualidade','resiliencia','tradicao']],['Ensaio Sobre a Cegueira',['filosofia','resiliencia','justica','intensidade']],['O Diário de Anne Frank',['resiliencia','sensibilidade','coragem','sonho']],['Torto Arado',['tradicao','justica','familia','resiliencia']],['A Moreninha',['harmonia','arte','carisma','sonho']]],
+ serie:[['Mad Men',['carisma','ambicao','palco','misterio']],['Breaking Bad',['poder','estrategia','ambicao','intensidade']],['The Crown',['poder','disciplina','tradicao','servico']],['Sherlock',['analise','misterio','filosofia','inovacao']],['Friends',['carisma','palavra','familia','harmonia']],['La Casa de Papel',['estrategia','rebeldia','coragem','carisma']],['Stranger Things',['aventura','coragem','sonho','lealdade']],['The Office',['palavra','carisma','servico','harmonia']],['Peaky Blinders',['poder','estrategia','coragem','ambicao']],['Anne with an E',['arte','sonho','sensibilidade','palavra']],['Vikings',['coragem','aventura','poder','lideranca']],['Dark',['misterio','filosofia','analise','intensidade']],['Grey\'s Anatomy',['cuidado','servico','intensidade','resiliencia']],['Ted Lasso',['otimismo','servico','carisma','harmonia']],['Cobra Kai',['disciplina','coragem','resiliencia','tradicao']],['Fleabag',['arte','intensidade','palavra','rebeldia']],['The Last of Us',['cuidado','resiliencia','coragem','lealdade']],['Round 6',['estrategia','resiliencia','intensidade','justica']]],
+ novela:[['Renascer',['poder','resiliencia','familia','tradicao','lideranca']],['Avenida Brasil',['estrategia','justica','resiliencia','intensidade']],['Vale Tudo',['ambicao','justica','poder','intensidade']],['Tieta',['carisma','palco','liberdade','sensualidade']],['O Clone',['sonho','paixao','arte','intuicao']],['Gabriela',['sensualidade','liberdade','arte','tradicao']],['Rei do Gado',['poder','tradicao','familia','justica']],['Roque Santeiro',['carisma','palavra','rebeldia']],['Senhora do Destino',['familia','resiliencia','cuidado','justica']],['Terra Nostra',['paixao','tradicao','familia','sonho']],['A Favorita',['misterio','estrategia','intensidade']],['Império',['poder','ambicao','familia','justica']],['Cheias de Charme',['carisma','palco','arte','resiliencia']],['Caras e Bocas',['arte','sensibilidade','harmonia','sonho']],['Pantanal',['tradicao','familia','sensualidade','sonho']],['A Viagem',['misterio','intuicao','sensibilidade','justica']],['Laços de Família',['familia','cuidado','intensidade','resiliencia']],['O Bem-Amado',['carisma','palavra','estrategia','rebeldia']]],
+ musica:[['Raul Seixas',['rebeldia','visao','filosofia','palco']],['Chico Buarque',['palavra','arte','justica','sensibilidade']],['Cartola',['arte','sensibilidade','resiliencia','sonho']],['Elis Regina',['palco','intensidade','arte','carisma']],['Tim Maia',['carisma','paixao','palco','liberdade']],['Cazuza',['rebeldia','paixao','palavra','intensidade']],['Legião Urbana',['rebeldia','filosofia','sensibilidade','justica']],['Roberto Carlos',['carisma','tradicao','paixao','palco']],['Gilberto Gil',['visao','arte','filosofia','liberdade']],['Marisa Monte',['arte','sensibilidade','intuicao','harmonia']],["Racionais MC's",['justica','coragem','rebeldia','palavra']],['Beethoven',['poder','visao','intensidade','disciplina']],['Rita Lee',['rebeldia','liberdade','carisma','arte']],['Djavan',['arte','sensibilidade','sonho','harmonia']],['Adoniran Barbosa',['tradicao','palavra','resiliencia','sensibilidade']],['Clara Nunes',['tradicao','paixao','palco','sensibilidade']],['Belchior',['filosofia','palavra','rebeldia','sonho']],['Ivete Sangalo',['carisma','palco','otimismo','liberdade']]]
+};
+const EPOCA=[['a Florença renascentista dos Médici',['visao','arte','poder','ambicao','inovacao'],'onde ideias novas, arte e engenharia explodiam ao mesmo tempo — e você seria mecenas e visionário, não figurante'],['a Grécia Antiga dos filósofos',['filosofia','analise','palavra','justica'],'discutindo a verdade na ágora, onde a palavra e o pensamento moviam o mundo'],['a Roma Imperial',['poder','ambicao','disciplina','lideranca'],'comandando legiões e erguendo impérios que atravessam séculos'],['a Belle Époque de Paris',['arte','carisma','palco','sensualidade'],'entre cafés, cabarés e salões, onde o charme e a arte eram moeda corrente'],['os anos 1960 da contracultura',['rebeldia','liberdade','visao','arte'],'no olho do furacão que reinventou a música, os costumes e o futuro'],['a Era das Grandes Navegações',['aventura','coragem','liberdade','resiliencia'],'cruzando oceanos rumo ao desconhecido, movido pela sede do horizonte'],['o Velho Oeste americano',['coragem','liberdade','justica','acao'],'onde a lei era a coragem e cada dia pedia uma decisão de peito aberto'],['a Era Vitoriana',['tradicao','disciplina','misterio','analise'],'entre salões, invenções e mistérios, onde a razão e a etiqueta reinavam'],['o Egito dos faraós',['misterio','poder','intuicao','tradicao'],'onde o sagrado e o poder se confundiam e os grandes nomes viravam eternos']];
+const PAR={'Áries':['Leão','Sagitário','Câncer'],'Leão':['Áries','Sagitário','Touro'],'Sagitário':['Áries','Leão','Virgem'],'Touro':['Virgem','Capricórnio','Leão'],'Virgem':['Touro','Capricórnio','Sagitário'],'Capricórnio':['Touro','Virgem','Áries'],'Gêmeos':['Libra','Aquário','Peixes'],'Libra':['Gêmeos','Aquário','Capricórnio'],'Aquário':['Gêmeos','Libra','Touro'],'Câncer':['Escorpião','Peixes','Áries'],'Escorpião':['Câncer','Peixes','Leão'],'Peixes':['Câncer','Escorpião','Gêmeos']};
+const CHAR={'Áries':['Capitão Rodrigo','o guerreiro galante de "O Tempo e o Vento" — coragem, honra e um sorriso desafiador.'],'Touro':['Gabriela','a de cravo e canela — sensual, livre e enraizada na terra, dona do próprio compasso.'],'Gêmeos':['Macunaíma','o herói de mil caras — malandro, curioso e impossível de rotular.'],'Câncer':['Dona Flor','que ama com o corpo e a alma, equilibrando ternura e paixão entre dois mundos.'],'Leão':['Tieta','magnética e triunfal, ela volta para casa e faz a cidade inteira girar ao seu redor.'],'Virgem':['Policarpo Quaresma','o idealista meticuloso, que ama o Brasil com o rigor de quem cuida de cada detalhe.'],'Libra':['Bentinho','de "Dom Casmurro" — encantador, elegante e eternamente às voltas com as duas mãos da balança.'],'Escorpião':['Capitu','dos olhos de ressaca — enigmática, intensa e inesquecível.'],'Sagitário':['Riobaldo','o jagunço-filósofo de "Grande Sertão" — sempre a caminho, sempre buscando o sentido.'],'Capricórnio':['Pedro Bala','o líder dos "Capitães da Areia" — nascido para comandar e sobreviver a qualquer maré.'],'Aquário':['Capitão Nascimento','indomável e à frente do seu tempo, fiel apenas ao próprio código.'],'Peixes':['Macabéa','a sonhadora de "A Hora da Estrela" — frágil, poética e cheia de um mundo secreto.']};
+const SOBRENOME={'silva':'do latim para "floresta, mata" — a família da selva, das raízes fincadas na terra. É o sobrenome mais comum do país: você faz parte da espinha dorsal do Brasil.','santos':'de devoção religiosa, "dos santos" — nome de quem se colocava sob a proteção do sagrado. Carrega fé e tradição.','oliveira':'toponímico, da oliveira — a árvore da paz e da abundância. Sinal de raízes serenas e frutíferas.','souza':'toponímico, ligado às margens de um rio em Portugal. Fala de origem, terra e pertencimento.','sousa':'toponímico, ligado às margens de um rio em Portugal. Fala de origem, terra e pertencimento.','ferreira':'do "ferreiro" ou da terra rica em ferro — a família do trabalho duro e do metal que se dobra pela força.','pereira':'toponímico, da pereira — árvore que dá fruto. Nome de quem vem de terra fértil.','costa':'toponímico, de quem vivia junto à costa ou à encosta. Gente de fronteira entre a terra e o mar.','rodrigues':'patronímico, "filho de Rodrigo" — do germânico "senhor glorioso, poderoso". Linhagem de comando.','almeida':'toponímico de origem árabe ("a mesa", planalto) — nome nobre, de quem vem de terras altas.','nascimento':'de devoção, ligado ao Natal e ao nascer — nome de recomeço, de vida que chega.','lima':'toponímico, do rio Lima em Portugal — "o rio do esquecimento" dos antigos. Um nome com lenda.','araujo':'toponímico, de uma antiga região portuguesa. Nome de linhagem e de terra.','gomes':'patronímico medieval, ligado a "homem" — do germânico "guma". Nome antigo de linhagem.','ribeiro':'toponímico, de quem morava junto ao ribeiro, ao pequeno rio. Gente das águas correntes.','carvalho':'toponímico, do carvalho — a árvore da força e da longevidade. Símbolo de solidez.','gonçalves':'patronímico, "filho de Gonçalo" — do germânico "salvo em combate". Sangue de guerreiro.','martins':'patronímico, "filho de Martim" — ligado a Marte, o deus da guerra. Nome de coragem.','jorgetto':'de origem italiana, diminutivo ligado a "Giorgio" (Jorge), do grego para "aquele que trabalha a terra". O sufixo -etto é o carinho do "pequeno Jorge", o herdeiro que leva o nome adiante.','casteller':'de raiz ligada a "castelo, castelão" — o nome de quem guardava ou habitava a fortaleza. Fala de proteção e de posição.'};
+const UFS=[['AC','Acre'],['AL','Alagoas'],['AP','Amapá'],['AM','Amazonas'],['BA','Bahia'],['CE','Ceará'],['DF','Distrito Federal'],['ES','Espírito Santo'],['GO','Goiás'],['MA','Maranhão'],['MT','Mato Grosso'],['MS','Mato Grosso do Sul'],['MG','Minas Gerais'],['PA','Pará'],['PB','Paraíba'],['PR','Paraná'],['PE','Pernambuco'],['PI','Piauí'],['RJ','Rio de Janeiro'],['RN','Rio Grande do Norte'],['RS','Rio Grande do Sul'],['RO','Rondônia'],['RR','Roraima'],['SC','Santa Catarina'],['SP','São Paulo'],['SE','Sergipe'],['TO','Tocantins']];
+const REGIAO={'SP':'Terra do "mano", do "da hora" e do "mó". A Galeria do Rock, a Rua Augusta e as tardes no Playcenter fazem parte do seu DNA paulistano.','MG':'Terra do "uai", do "trem bom" e do "sô". Pão de queijo quentinho, tutu de feijão e a fé no Galo ou na Raposa correm no seu sangue mineiro.','SC':'Terra do "bah", do "tchê" e do "tri legal". Chimarrão na roda, o mar de Morro dos Conventos e o vento frio do Sul temperam o seu jeito catarinense.','RS':'Terra do "bah tchê" e do mate amargo. Churrasco, chimarrão e o orgulho gaúcho moldam o seu jeito.','BA':'Terra do axé, do dendê e do "meu rei". O tempero baiano, o acarajé e o ritmo no corpo são a sua marca.','PE':'Terra do frevo, do maracatu e do "visse". O Recife, o Carnaval de rua e o caldo de cana fazem parte de você.','RJ':'Terra do "maneiro", da praia e do samba. O calor carioca e o jeito solto de levar a vida são a sua assinatura.'};
+function regiao(uf){return REGIAO[uf]||'Cada canto do Brasil tem seu tempero — e o seu carrega o sotaque, a comida e as histórias da sua terra natal.';}
+function presidente(y){const t=[[1940,1945,'Getúlio Vargas'],[1946,1950,'Eurico Gaspar Dutra'],[1951,1953,'Getúlio Vargas'],[1954,1955,'Café Filho'],[1956,1960,'Juscelino Kubitschek'],[1961,1961,'Jânio Quadros / João Goulart'],[1962,1963,'João Goulart'],[1964,1966,'Castelo Branco'],[1967,1968,'Costa e Silva'],[1969,1973,'Emílio Médici'],[1974,1978,'Ernesto Geisel'],[1979,1984,'João Figueiredo'],[1985,1989,'José Sarney'],[1990,1991,'Fernando Collor'],[1992,1994,'Itamar Franco'],[1995,2002,'Fernando Henrique Cardoso'],[2003,2010,'Lula'],[2011,2012,'Dilma Rousseff']];for(const[a,b,n]of t)if(y>=a&&y<=b)return n;return'—';}
+
+/* ===================== HELPERS DE PERFIL ===================== */
+function buildTags(c){
+  const comps=[{label:c.signo,kind:'signo',tags:SIGNO[c.signo].tags},{label:'Caminho '+c.lp,kind:'num',tags:NUM[c.lp].tags},{label:'Expressão '+c.exp,kind:'exp',tags:(NUM[c.exp]||{tags:[]}).tags},{label:c.animal,kind:'animal',tags:ANIMAL[c.animal].tags},{label:c.elemento,kind:'elem',tags:ELEM[c.elemento]}];
+  const w={};comps.forEach(cp=>{const wt=cp.kind==='num'?3:cp.kind==='signo'?2:1;cp.tags.forEach(t=>{w[t]=(w[t]||0)+wt;});});
+  return {comps,w};
+}
+function topTags(w,n){return Object.keys(w).sort((a,b)=>w[b]-w[a]).slice(0,n);}
+function attribute(itemTags,comps,max){const seen=[];['signo','animal','num','exp','elem'].forEach(kind=>{const cp=comps.find(x=>x.kind===kind&&x.tags.some(t=>itemTags.includes(t)));if(cp)seen.push(cp.label);});return seen.slice(0,max||3);}
+function score(itemTags,w){return itemTags.reduce((s,t)=>s+(w[t]||0),0);}
+function phrase(labels){if(!labels.length)return 'o seu conjunto de astros';if(labels.length===1)return labels[0];if(labels.length===2)return labels[0]+' e '+labels[1];return labels.slice(0,-1).join(', ')+' e '+labels[labels.length-1];}
+// escolha VARIADA: determinística por pessoa, mas diferente entre pessoas
+function pickMedia(list,w,comps,seed,off){
+  const sc=list.map(([t,tags])=>({t,tags,s:score(tags,w)})).sort((a,b)=>b.s-a.s).filter(x=>x.s>0);
+  if(!sc.length)return {titulo:list[0][0].replace(/^!\[|\]$/g,''),why:attribute(list[0][1],comps,3)};
+  const max=sc[0].s;let pool=sc.filter(x=>x.s>=max-2);if(pool.length<3)pool=sc.slice(0,Math.min(4,sc.length));
+  const ch=pool[(seed*7+off*131)%pool.length];
+  return {titulo:ch.t.replace(/^!\[|\]$/g,''),why:attribute(ch.tags,comps,3)};
+}
+function pickProfs(w,comps,seed){
+  const sc=PROF.map(p=>({n:p[0],tags:p[1],s:score(p[1],w)})).sort((a,b)=>b.s-a.s).filter(x=>x.s>0);
+  const fixed=sc.slice(0,2);const tail=shuffleSeeded(sc.slice(2,8),seed).slice(0,3);
+  return fixed.concat(tail).sort((a,b)=>b.s-a.s).map(p=>({nome:p.n,why:attribute(p.tags,comps,3)}));
+}
+const WHYTPL=['combina com','fala direto com','tem a cara de','ecoa','é a trilha de'];
+
+const SUPER={poder:'transformar "impossível" em cronograma',lideranca:'fazer uma sala inteira te seguir sem pedir',palavra:'convencer qualquer um em três frases',carisma:'iluminar o ambiente só de entrar',coragem:'agir enquanto os outros ainda pensam',acao:'resolver hoje o que os outros adiam pra amanhã',analise:'enxergar o padrão que ninguém viu',intuicao:'sentir a verdade antes de ela ser dita',sensibilidade:'entender as pessoas por dentro',arte:'transformar sentimento em beleza',disciplina:'terminar o que todo mundo desistiu',resiliencia:'levantar mais forte depois de cada queda',estrategia:'ganhar o jogo três lances antes',liberdade:'achar a saída onde só há paredes',aventura:'transformar qualquer dia comum em história',cuidado:'fazer qualquer um se sentir em casa',visao:'ver o futuro chegando antes de todo mundo',inovacao:'inventar a saída que ninguém tinha pensado',ambicao:'mirar alto e não parar até chegar lá',justica:'defender quem precisa sem pensar duas vezes'};
+const KRYP={poder:'delegar de verdade e deixar alguém entrar no comando',lideranca:'aceitar seguir quando não é a sua vez de liderar',palavra:'ouvir tanto quanto você fala',carisma:'o silêncio e a falta de reconhecimento',coragem:'ter paciência com quem é mais lento',acao:'esperar sem se irritar',analise:'aceitar que "bom" às vezes já basta',intuicao:'confiar nos fatos quando o coração grita o contrário',sensibilidade:'não levar tudo para o lado pessoal',arte:'lidar com a parte burocrática e chata da vida',disciplina:'relaxar as próprias regras de vez em quando',resiliencia:'pedir ajuda antes de esgotar',estrategia:'agir pelo impulso e confiar no acaso',liberdade:'compromissos longos e portas fechadas',aventura:'a rotina e a repetição do dia a dia',cuidado:'cuidar de si com o mesmo carinho que dá aos outros',visao:'ter paciência com quem ainda não enxerga o que você vê',inovacao:'as regras sem sentido e o "sempre foi assim"',ambicao:'lembrar que o que você vale não é o que você conquista',justica:'aceitar que nem tudo tem conserto'};
+function sintese(tt){const map={poder:'quer construir algo que dure',lideranca:'assume a frente naturalmente',visao:'enxerga longe',palavra:'convence pela conversa',arte:'cria beleza onde passa',coragem:'não recua de um desafio',cuidado:'protege quem ama',liberdade:'não nasceu pra ficar preso',intuicao:'sente antes de entender',disciplina:'termina o que começa',aventura:'vive em movimento',estrategia:'pensa alguns lances à frente',sensibilidade:'sente o mundo em alta definição',ambicao:'mira alto sem pedir desculpa',carisma:'atrai gente sem esforço',rebeldia:'questiona o que os outros aceitam',analise:'entende o que está por trás',resiliencia:'não desiste fácil',inovacao:'inventa caminhos novos',impeto:'age antes que a dúvida chegue',justica:'não deixa barato o que é errado'};return tt.map(t=>map[t]||'deixa marca por onde passa').join(', ')+' — e deixa marca por onde passa';}
+function sombra(tt){const map={poder:'Quando aperta, você tende a querer controlar tudo sozinho — e esquece de deixar alguém entrar no comando.',lideranca:'Você lidera com facilidade, mas às vezes carrega peso demais que podia ser dividido.',liberdade:'Sua sede de espaço é linda, mas pode virar fuga bem na hora de fincar raiz.',aventura:'Seu apetite por novidade às vezes deixa o que já é bom para trás cedo demais.',sensibilidade:'Você sente tanto que corre o risco de levar para o pessoal o que nem era com você.',intuicao:'Confia tanto no instinto que às vezes ignora os fatos que insistem em avisar.',analise:'Seu olho afiado pode virar autocrítica — o "bom" te escapa em busca do "perfeito".',intensidade:'Você ama e defende com tudo, mas esquecer e perdoar é o seu treino desta vida.',ambicao:'A meta te move, mas cuidado pra não confundir o que você conquista com o que você vale.',disciplina:'Sua firmeza é rara — só não deixe as próprias regras te aprisionarem.',rebeldia:'Você questiona tudo, e às vezes briga com regras que até jogavam a seu favor.',carisma:'Você encanta fácil — o desafio é deixar as pessoas verem quem você é por baixo do brilho.',arte:'Sua sensibilidade cria beleza, mas pode te fazer fugir do lado prático que a vida cobra.',acao:'Sua pressa resolve muita coisa — só cuidado pra não atropelar o que pedia calma.',justica:'Seu senso de certo é forte — só cuidado pra não virar dureza com quem erra.'};return tt.map(t=>map[t]).filter(Boolean)[0]||'Seu maior aprendizado é equilibrar a força que te move com a leveza de deixar a vida acontecer.';}
+
+/* ===== FRASE "CERTEIRA" DA PRÉVIA (efeito Barnum calibrado) =====
+   Derivada do tag dominante do perfil. Duas variações por tag, escolhidas
+   pela semente — a mesma pessoa vê sempre a mesma; pessoas diferentes veem
+   frases diferentes. Objetivo: o arrepio ANTES do preço. */
+const BARNUM={
+ poder:['Você já foi chamado de “controlador” por gente que não tinha ideia do peso que você estava segurando sozinho.','Delegar te dá mais trabalho do que fazer — e você sabe que isso um dia vai te cobrar caro.'],
+ lideranca:['Você já assumiu a frente de alguma coisa sem ninguém pedir, e depois se perguntou por que sempre sobra pra você.','Em qualquer grupo, você percebe rápido demais quando ninguém está conduzindo — e o silêncio te incomoda até você agir.'],
+ ambicao:['Você conquista uma coisa e leva mais ou menos dois dias para se sentir insatisfeito de novo.','Existe uma versão sua de dez anos à frente que você persegue em silêncio, sem contar pra quase ninguém.'],
+ visao:['Você já explicou uma ideia e ouviu “não vai dar certo” de gente que, três anos depois, estava fazendo exatamente aquilo.','Você enxerga o final de algumas histórias no começo — e cansa de esperar os outros chegarem lá.'],
+ inovacao:['Frases como “sempre foi assim” causam em você uma irritação física, quase involuntária.','Você já reinventou do zero uma coisa que estava funcionando, só porque dava pra ser melhor.'],
+ rebeldia:['Você obedece regras que fazem sentido e trava com as que não fazem — e isso já te custou alguma coisa.','Te dizerem “porque sim” funciona com você exatamente ao contrário.'],
+ palavra:['As pessoas te contam coisas que não deviam contar — e você nem precisou perguntar.','Você já ganhou uma discussão e saiu com a sensação estranha de que talvez não devesse ter ganhado.'],
+ carisma:['Você entra num lugar e sente o clima mudar — e finge que não percebeu.','Muita gente acha que te conhece bem. Pouquíssimas conhecem.'],
+ palco:['Você diz que não liga para reconhecimento, mas lembra com precisão da última vez que passou despercebido.','Quando você fala, as pessoas param — e isso te agrada mais do que você admite em voz alta.'],
+ coragem:['Você já tomou uma decisão grande no impulso e, olhando pra trás, faria de novo.','Enquanto os outros pesam prós e contras, você já está do outro lado — às vezes cedo demais.'],
+ acao:['Esperar te cansa mais do que trabalhar.','Você prefere resolver errado hoje do que resolver certo daqui a um mês.'],
+ impeto:['Você já mandou uma mensagem que releu depois e pensou: podia ter esperado uma hora.','Sua primeira reação costuma ser a verdadeira — e a segunda, a educada.'],
+ analise:['Você já reescreveu três vezes uma mensagem de duas linhas.','“Bom o suficiente” é uma expressão que você entende, mas não sente.'],
+ estrategia:['Você já sabia o final daquela situação semanas antes de ela acontecer — e não falou nada.','Você guarda informação não por segredo, mas porque sabe que a hora certa vale mais.'],
+ disciplina:['Você termina o que começou mesmo quando já perdeu a vontade — e chama isso de caráter.','Suas próprias regras já te prenderam mais do que qualquer chefe.'],
+ resiliencia:['Você já se levantou de uma coisa que teria derrubado gente que você conhece — e quase ninguém soube.','Você pede ajuda tarde. Sempre tarde demais.'],
+ intuicao:['Você já soube que uma pessoa não prestava antes de ter um único motivo concreto — e estava certo.','Quando o instinto e os fatos brigam dentro de você, o instinto costuma ganhar. E costuma acertar.'],
+ sensibilidade:['Você já levou pro pessoal uma coisa que nem era com você — e ficou dias com aquilo.','Você sente o humor dos outros entrando em você, como se fosse seu.'],
+ arte:['Você repara em detalhes de beleza que as pessoas ao seu lado simplesmente não veem.','Ambientes feios e frios te esgotam de um jeito que você tem dificuldade de explicar.'],
+ sonho:['Você tem uma vida inteira acontecendo na sua cabeça que quase ninguém conhece.','Você já se pegou emocionado com uma cena que nem chegou a acontecer.'],
+ misterio:['As pessoas te acham difícil de ler — e você deixa que achem.','Você conta a sua história em pedaços, e escolhe com cuidado quem recebe cada um.'],
+ intensidade:['Você já foi chamado de “intenso demais” — e no fundo achou graça.','Você não sente as coisas pela metade. Nunca conseguiu.'],
+ cuidado:['Você cuida de todo mundo e trava na hora de aceitar que cuidem de você.','Você lembra de datas, alergias e manias dos outros — e ninguém lembra das suas.'],
+ familia:['Você mede as suas decisões grandes pelo efeito que elas teriam em duas ou três pessoas específicas.','Tem uma pessoa da sua família que você protege sem nunca ter combinado isso com ninguém.'],
+ servico:['Você diz “sim” antes de conferir se tem tempo — e depois dá um jeito.','Você se sente estranhamente culpado quando descansa.'],
+ justica:['Você não consegue deixar passar uma injustiça pequena, mesmo quando ela não é sua.','Você já brigou por alguém que nem ficou sabendo.'],
+ liberdade:['Você já recusou uma coisa boa só porque vinha com corrente junto.','A ideia de dever satisfação a alguém te sufoca mais do que a própria obrigação.'],
+ aventura:['A rotina te dá um cansaço que o esforço nunca deu.','Você já mudou de rumo sem plano B e se saiu bem — o que só piorou o hábito.'],
+ versatilidade:['Você é bom em coisas demais, e isso já te atrapalhou na hora de escolher uma.','As pessoas te descrevem de formas completamente diferentes umas das outras. Todas estão certas.'],
+ filosofia:['Você tem perguntas que carrega há anos e nunca falou em voz alta.','Você já perdeu uma noite de sono com um pensamento que não tinha nenhuma urgência prática.'],
+ tradicao:['Você guarda um objeto sem valor nenhum só porque foi de alguém.','Você respeita o que veio antes — e desconfia de quem quer jogar tudo fora.'],
+ diplomacia:['Você percebe uma tensão na sala antes de qualquer palavra ser dita, e já está calculando como desarmar.','Você absorve o desconforto dos outros para o ambiente ficar em paz. E raramente alguém faz isso por você.'],
+ harmonia:['Você adia conversas difíceis mais tempo do que devia, esperando que se resolvam sozinhas.','Um clima ruim no ambiente estraga o seu dia inteiro.'],
+ precisao:['Um detalhe torto na tela te incomoda até você arrumar.','Você já refez um trabalho inteiro por causa de uma coisa que ninguém teria notado.'],
+ generosidade:['Você dá mais do que pode e chama isso de normal.','Você já ficou sem para alguém não ficar sem — e não contou pra ninguém.'],
+ lealdade:['Você tem pouquíssimas pessoas de verdade, e por elas você faz qualquer coisa.','Traição é a única coisa que você não consegue relevar.'],
+ otimismo:['Você acha jeito onde os outros já desistiram — e às vezes te chamam de ingênuo por isso.','Você segura o astral de gente que nem sabe que você está segurando.'],
+ sensualidade:['Você repara em textura, cheiro e sabor mais do que a maioria das pessoas ao seu redor.','Prazer, pra você, nunca foi supérfluo.'],
+ curiosidade:['Você já passou quarenta minutos pesquisando uma coisa que não tinha a menor importância.','Você começa mais coisas do que termina — e não é preguiça, é apetite.'],
+ esperteza:['Você sempre acha a saída, mesmo quando a porta está fechada.','Você percebe a intenção por trás do que as pessoas falam, não o que elas falam.'],
+ sinceridade:['Você é péssimo em fingir que gostou.','As pessoas te procuram quando querem a verdade, e evitam você quando querem consolo.'],
+ franqueza:['Você já falou uma verdade necessária na hora errada.','Sua sinceridade já foi confundida com falta de educação por gente que não te conhece.'],
+ inspiracao:['Você já mudou o rumo de alguém com uma frase que nem lembra ter dito.','As pessoas saem de perto de você com mais vontade de fazer as coisas.'],
+ crescimento:['Você não consegue ficar dois anos sendo a mesma pessoa.','Você mede a sua vida pelo quanto aprendeu, não pelo quanto acumulou.'],
+ etica:['Você já perdeu uma oportunidade por não conseguir passar por cima de alguém.','Existe uma linha que você não cruza, mesmo quando ninguém está vendo.'],
+ estabilidade:['Você precisa de chão firme para arriscar — e as pessoas confundem isso com medo.','Você é a pessoa em quem os outros se apoiam quando tudo balança.'],
+ paixao:['Você não sabe se envolver pela metade em nada que importe.','Quando você quer, você quer inteiro — e isso já assustou alguém.'],
+ independencia:['Você prefere carregar sozinho a dever favor.','Você aprendeu cedo que contar com você mesmo dava menos decepção.'],
+ sobrevivencia:['Você já se virou em situação que gente com mais recurso não teria aguentado.','Você tem um instinto pra perigo que os outros só entendem depois.']
+};
+function barnumFrase(c,tt,seed){
+  for(const t of tt){
+    if(BARNUM[t]){const par=BARNUM[t];return par[(seed+c.lp)%par.length];}
+  }
+  return 'Você é mais complicado do que a maioria das pessoas percebe — e mais simples do que você mesmo acha.';
+}
+
+function analisaSobrenome(nomeCompleto){
+  const parts=nomeCompleto.trim().split(/\s+/).filter(p=>!/^(de|da|do|das|dos|e)$/i.test(p));
+  const sobs=parts.slice(1);
+  for(let i=sobs.length-1;i>=0;i--){const key=stripAccents(sobs[i]).toLowerCase();if(SOBRENOME[key])return {nome:sobs[i],texto:SOBRENOME[key],nivel:1};}
+  if(sobs.length){
+    const raw=sobs[sobs.length-1];const k=stripAccents(raw).toLowerCase();let cl=null;
+    if(/(es|ez)$/.test(k))cl='é um sobrenome patronímico — dos que nasceram de "filho de", carregando o nome do antepassado como herança e continuidade.';
+    else if(/(etto|elli|ini|ato|oni|azzo|ucci)$/.test(k))cl='carrega a raiz das famílias italianas que cruzaram o oceano e trouxeram uma história que não se repete em cada esquina.';
+    else if(/(ski|czak|wicz|czyk)$/.test(k))cl='guarda a marca das famílias eslavas (polonesas, ucranianas) que ajudaram a colonizar o Sul do Brasil.';
+    else if(/(eira|oso|osa|al|edo)$/.test(k))cl='é um sobrenome toponímico — dos que nasceram do lugar, da árvore ou da paisagem de origem da família. Fala de raízes fincadas numa terra.';
+    else if(/(inho|inha)$/.test(k))cl='traz o diminutivo afetuoso, o "pequeno" que virou nome de família — sinal de uma linhagem contada com carinho.';
+    if(cl)return {nome:raw,texto:cl,nivel:2};
+    return {nome:raw,texto:'é um sobrenome raro no Brasil — dos que quase ninguém divide com você. Nomes assim guardam histórias de família que não se repetem em cada esquina, e combinam com quem nunca foi feito para ser mais um na multidão.',nivel:3};
+  }
+  return null;
+}
+
+/* ===================== APP ===================== */
+const $=id=>document.getElementById(id);
+
+/* selects de data — 3 toques no celular, melhor que o input date nativo */
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+(function initData(){
+  const dia=$('dia'),mes=$('mes'),ano=$('ano');
+  for(let i=1;i<=31;i++){const o=document.createElement('option');o.value=i;o.textContent=i;dia.appendChild(o);}
+  MESES.forEach((n,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=n;mes.appendChild(o);});
+  for(let y=2012;y>=1940;y--){const o=document.createElement('option');o.value=y;o.textContent=y;ano.appendChild(o);}
+})();
+
+/* UF agora só é pedido DEPOIS do desbloqueio (menos fricção antes do valor) */
+const ufSel=$('uf');UFS.forEach(([s,n])=>{const o=document.createElement('option');o.value=s;o.textContent=n;ufSel.appendChild(o);});
+
+/* urgência de entrada — só aparece se for verdadeira (ver CONFIG) */
+if(!CONFIG.LAUNCH_URGENCY){$('urgencyBar').style.display='none';}
+else{$('urgencyBar').textContent=CONFIG.LAUNCH_TEXT;}
+
+let CURRENT=null,DERIVED=null;
+
+function gerar(){
+  $('erro').textContent='';
+  const nome=$('nome').value.trim();
+  const d=Number($('dia').value),m=Number($('mes').value),y=Number($('ano').value);
+  if(nome.length<2||nome.split(/\s+/).filter(Boolean).length<1)return err('Digite seu nome completo.');
+  if(!d||!m||!y)return err('Escolha o dia, o mês e o ano em que você nasceu.');
+  const teste=new Date(y,m-1,d);
+  if(teste.getDate()!==d||teste.getMonth()!==m-1)return err('Essa data não existe no calendário. Confira o dia.');
+  if(y<1940||y>2012)return err('Aceitamos nascimentos entre 1940 e 2012.');
+  const primeiro=nome.split(/\s+/)[0];
+  CURRENT={nome,primeiro,uf:'',y,m,d,signo:zodiac(m,d),animal:chineseAnimal(y,m,d),elemento:chineseElement(y,m,d),lp:lifePath(y,m,d),exp:expression(primeiro),idade:ageAt(y,m,d)};
+  derive();render();
+}
+function err(t){$('erro').textContent=t;}
+
+function derive(){
+  const c=CURRENT;const{comps,w}=buildTags(c);const tt=topTags(w,3);const seed=seedNum(c);
+  const arqScores=ARQ.map(a=>[a,a[1].reduce((s,t)=>s+(w[t]||0),0)]).sort((x,y)=>y[1]-x[1]);
+  const arq=arqScores[0][0];const arq2=arqScores[1][0];
+  const midia={filme:pickMedia(MIDIA.filme,w,comps,seed,1),livro:pickMedia(MIDIA.livro,w,comps,seed,2),serie:pickMedia(MIDIA.serie,w,comps,seed,3),novela:pickMedia(MIDIA.novela,w,comps,seed,4),musica:pickMedia(MIDIA.musica,w,comps,seed,5)};
+  const profs=pickProfs(w,comps,seed);
+  const ep=EPOCA.map(e=>[e,e[1].reduce((s,t)=>s+(w[t]||0),0)]).sort((a,b)=>b[1]-a[1]);
+  const epChoice=(function(){const max=ep[0][1];let pool=ep.filter(x=>x[1]>=max-2);if(pool.length<2)pool=ep.slice(0,2);return pool[(seed*7+90)%pool.length][0][0];})();
+  DERIVED={comps,w,tt,seed,arq,arqNome:arq[0]+(arqScores[1][1]>0?' '+arq2[0].replace(/^O /,'').replace(/^A /,''):''),midia,profs,ep:epChoice,char:CHAR[c.signo],tarot:TAROT[c.lp]||['O Mago','o poder de transformar vontade em realidade'],sobre:analisaSobrenome(c.nome)};
+}
+
+function render(){
+  const c=CURRENT,D=DERIVED;
+  $('rName').textContent=c.nome;
+  $('rSigno').textContent=c.signo;
+  $('rChines').textContent=c.elemento+' · '+c.animal;
+  $('rCaminho').textContent=c.lp;
+  $('rTeaser').innerHTML=`<span class="drop">${c.primeiro[0]}</span>${c.primeiro}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
+
+  // a frase "certeira" — o arrepio antes do preço
+  $('rBarnumTxt').textContent=barnumFrase(c,D.tt,D.seed);
+
+  // curiosity gap — o arquétipo é a PRIMEIRA coisa trancada
+  $('lockedH').textContent='Seu arquétipo já foi calculado. Ele está logo ali.';
+  const rev=[
+    ['★ Seu arquétipo — quem você é entre os doze',D.arqNome],
+    ['O lema que rege a sua vida',D.arq[2].replace(/\.$/,'')],
+    ['O personagem que você seria',D.char[0]],
+    ['Seu superpoder secreto',cap(SUPER[D.tt[0]]||'—')],
+    ['A profissão em que você brilha',D.profs[0].nome.replace(/\s*\/.*$/,'')],
+    ['A época em que devia ter nascido',D.ep.replace(/^a |^o |^os /,'')]
+  ];
+  $('revealGrid').innerHTML=rev.map(([l,v])=>`<div class="reveal"><span class="lock">🔒</span><div class="lbl">${l}</div><div class="val">${redact(v)}</div></div>`).join('');
+
+  // conteúdo completo (fica pronto, escondido até destravar)
+  $('fullProfile').innerHTML=
+    `<p class="lead">${cap(c.primeiro)}, ${SIGNO[c.signo].desc}</p>`+
+    `<p>${NUM[c.lp].desc}${NUM[c.exp]?(' E o seu nome vibra no número '+c.exp+', somando a isso um traço de '+NUM[c.exp].tags[0]+'.'):''}</p>`+
+    `<p>Como <strong>${c.animal} de ${c.elemento}</strong>, você é ${ANIMAL[c.animal].adj}. Somando ${phrase(D.tt)}, desenha-se alguém que ${sintese(D.tt)}.</p>`+
+    `<p><em>A sua sombra mora onde mora a sua força.</em> ${sombra(D.tt)}</p>`;
+
+  $('charName').textContent=D.char[0];$('charText').textContent=D.char[1];
+
+  const wt=(i)=>WHYTPL[(D.seed+i)%WHYTPL.length];
+  $('midia').innerHTML=[['Filme',D.midia.filme],['Livro',D.midia.livro],['Série',D.midia.serie],['Novela',D.midia.novela],['Música',D.midia.musica]].map(([k,x],i)=>`<div class="li"><b>${k}:</b> ${x.titulo} — <span class="why">${wt(i)} ${phrase(x.why)}.</span></div>`).join('');
+
+  $('profOk').innerHTML=D.profs.map(p=>`<div class="li"><b>${p.nome}</b> — <span class="why">o encontro de ${phrase(p.why)} aponta pra cá.</span></div>`).join('');
+  const evitaTags=D.tt.filter(t=>EVITA[t]).slice(0,3);
+  $('profNo').innerHTML=(evitaTags.length?evitaTags:['liberdade']).map(t=>`<div class="li">${cap(EVITA[t]||EVITA.liberdade)}.</div>`).join('')+`<div class="li why">Não é incapacidade — é onde seus astros preferem que você não gaste sua melhor energia.</div>`;
+
+  $('tarotName').textContent=D.tarot[0];
+  $('tarotWhy').textContent=`Seu Caminho de Vida ${c.lp} te coloca sob ${D.tarot[0]}: ${D.tarot[1]} — e é assim que você se move pelo mundo.`;
+
+  $('epoca').innerHTML=`<p>Você teria brilhado em <strong>${D.ep}</strong>. O encontro de ${phrase(D.tt)} te colocaria bem no centro daquele mundo.</p>`;
+
+  $('superP').textContent=cap(SUPER[D.tt[0]]||'transformar ideias em movimento antes de todo mundo');
+  $('krypP').textContent=cap(KRYP[D.tt[0]]||'lembrar de desacelerar e deixar os outros acompanharem');
+
+  const pares=PAR[c.signo]||[];
+  $('par').innerHTML=`<p>No amor e nas parcerias, sua melhor sintonia é com <strong>${pares[0]}</strong> e <strong>${pares[1]}</strong> — quem acompanha o seu ritmo sem te apagar. Já com <strong>${pares[2]}</strong> mora o desafio delicioso: atração e atrito na mesma dose.</p>`;
+
+  if(D.sobre){const extra=D.sobre.nivel===1?` E combina com você: quem carrega esse nome e ainda é ${c.signo} ${c.animal} tinha mesmo que ter uma história pra contar.`:'';$('sobrenome').innerHTML=`<p><strong>${D.sobre.nome}</strong> — ${D.sobre.texto}${extra}</p>`;$('secSobre').style.display='';}else{$('secSobre').style.display='none';}
+
+  $('luckCor').textContent=SIGNO[c.signo].cor;$('luckNum').textContent=c.lp;$('luckDia').textContent=SIGNO[c.signo].dia;$('luckPedra').textContent=SIGNO[c.signo].pedra;
+  renderNostalgia();
+
+  // o arquétipo — agora o prêmio pago, revelado com destaque no topo
+  $('uArqNome').textContent=D.arqNome;
+  $('uArqLema').textContent='“'+D.arq[2]+'”';
+
+  $('landing').style.display='none';$('result').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderNostalgia(){
+  const c=CURRENT;if(!c)return;
+  const uf=c.uf?`<p>${regiao(c.uf)}</p>`:'';
+  $('nostalgia').innerHTML=`<p>No ano em que você nasceu, <strong>${c.y}</strong>, o Brasil era presidido por <strong>${presidente(c.y)}</strong>, e você já soma ${c.idade} voltas ao sol.</p>${uf}`;
+}
+
+/* ---- UF pedido só depois do desbloqueio ---- */
+function ufConfirm(){
+  const v=$('uf').value;if(!v)return;
+  CURRENT.uf=v;renderNostalgia();
+  $('ufAsk').innerHTML='<p style="margin:0;font-style:italic;color:var(--ink-soft)">✓ Pronto — o seu mapa agora inclui a cor da sua terra natal.</p>';
+}
+$('ufOk').addEventListener('click',ufConfirm);
+
+/* ---- pagamento (demo) ---- */
+function unlock(){
+  $('unlocked').style.display='block';$('lockedZone').style.display='none';
+  startCoupon();buildShareCard();
+  $('unlocked').scrollIntoView({behavior:'smooth'});
+}
+
+/* ================= CARD COMPARTILHÁVEL ================= */
+const SHARE_ASSETS={};
+function loadImg(src){return new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src;});}
+function wrapText(ctx,text,maxW){
+  const words=String(text).split(' ');const lines=[];let cur='';
+  words.forEach(w=>{const t=cur?cur+' '+w:w;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else{cur=t;}});
+  if(cur)lines.push(cur);return lines;
+}
+async function buildShareCard(){
+  const c=CURRENT,D=DERIVED;if(!c)return;
+  const cv=$('shareCanvas'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  try{await document.fonts.ready;}catch(e){}
+  if(!SHARE_ASSETS.loaded){
+    SHARE_ASSETS.orn=await loadImg('img/ornamento-heroi.png');
+    SHARE_ASSETS.selo=await loadImg('img/selo.png');
+    SHARE_ASSETS.roda=await loadImg('img/roda-zodiaco.jpg');
+    SHARE_ASSETS.loaded=true;
+  }
+  const A=SHARE_ASSETS;
+  // fundo pergaminho + roda do zodíaco esmaecida
+  ctx.fillStyle='#f4ecd8';ctx.fillRect(0,0,W,H);
+  if(A.roda){ctx.globalAlpha=.20;const r=A.roda;const rs=Math.max(W/r.width,H/r.height);
+    ctx.drawImage(r,(W-r.width*rs)/2,(H-r.height*rs)/2,r.width*rs,r.height*rs);ctx.globalAlpha=1;}
+  ctx.strokeStyle='#2e2620';ctx.lineWidth=6;ctx.strokeRect(38,38,W-76,H-76);
+  ctx.lineWidth=2;ctx.strokeRect(56,56,W-112,H-112);
+  ctx.textAlign='center';
+
+  // topo: kicker + ornamento
+  ctx.fillStyle='#8f2d2d';ctx.font='500 26px "Special Elite", monospace';
+  ctx.fillText('M A P A   D A   A L M A',W/2,142);
+  if(A.orn){const o=A.orn;const ow=W-420;const oh=o.height*ow/o.width;
+    ctx.globalAlpha=.9;ctx.drawImage(o,(W-ow)/2,168,ow,oh);ctx.globalAlpha=1;}
+
+  // rodapé fixo: selo + convite
+  if(A.selo){const sl=A.selo;const sw=132;ctx.drawImage(sl,(W-sw)/2,H-306,sw,sl.height*sw/sl.width);}
+  ctx.fillStyle='#8f2d2d';ctx.font='500 27px "Special Elite", monospace';
+  ctx.fillText('Faça o seu em',W/2,H-118);
+  ctx.fillStyle='#23395b';ctx.font='700 38px "Playfair Display", Georgia, serif';
+  ctx.fillText(CONFIG.SITE_URL,W/2,H-66);
+
+  // bloco central — centralizado na faixa livre entre ornamento e selo
+  const BAND_TOP=548,BAND_BOT=1008;
+  const SERIF='"Playfair Display", Georgia, serif',BODY='"Crimson Text", Georgia, serif';
+  const gapName=20,gapLabel=30,gapArq=14,gapAfterArq=30,gapLema=12,gapAfterLema=28,gapRule=30;
+  let arqSize=84,arqLines,lemaLines,total;
+  for(;;){
+    ctx.font='800 '+arqSize+'px '+SERIF;arqLines=wrapText(ctx,D.arqNome,W-230);
+    ctx.font='italic 38px '+BODY;lemaLines=wrapText(ctx,'“'+D.arq[2]+'”',W-250);
+    total=40+gapName+24+gapLabel
+      +arqLines.length*arqSize+(arqLines.length-1)*gapArq+gapAfterArq
+      +lemaLines.length*38+(lemaLines.length-1)*gapLema+gapAfterLema
+      +2+gapRule+32;
+    if((arqLines.length<=2&&total<=BAND_BOT-BAND_TOP)||arqSize<=52)break;
+    arqSize-=6;
+  }
+  let y=BAND_TOP+Math.max(0,(BAND_BOT-BAND_TOP-total)/2);
+  ctx.fillStyle='#5b4f42';ctx.font='italic 40px '+BODY;
+  y+=40;ctx.fillText(c.primeiro,W/2,y);y+=gapName;
+  ctx.fillStyle='#8f2d2d';ctx.font='500 24px "Special Elite", monospace';
+  y+=24;ctx.fillText('E N T R E   O S   D O Z E ,   V O C Ê   É',W/2,y);y+=gapLabel;
+  ctx.fillStyle='#23395b';ctx.font='800 '+arqSize+'px '+SERIF;
+  arqLines.forEach((l,i)=>{y+=arqSize;ctx.fillText(l,W/2,y);if(i<arqLines.length-1)y+=gapArq;});
+  y+=gapAfterArq;
+  ctx.fillStyle='#5b4f42';ctx.font='italic 38px '+BODY;
+  lemaLines.forEach((l,i)=>{y+=38;ctx.fillText(l,W/2,y);if(i<lemaLines.length-1)y+=gapLema;});
+  y+=gapAfterLema;
+  ctx.strokeStyle='#b08d3f';ctx.lineWidth=2;
+  y+=2;ctx.beginPath();ctx.moveTo(W/2-170,y);ctx.lineTo(W/2+170,y);ctx.stroke();y+=gapRule;
+  ctx.fillStyle='#2e2620';ctx.font='500 32px '+BODY;
+  y+=32;ctx.fillText(c.signo+'  ✦  '+c.elemento+' de '+c.animal+'  ✦  Caminho '+c.lp,W/2,y);
+  const url=cv.toDataURL('image/png');
+  const prev=$('sharePreview');prev.src=url;prev.style.display='block';
+}
+function shareBlob(){return new Promise(res=>$('shareCanvas').toBlob(res,'image/png'));}
+$('shareBtn').addEventListener('click',async()=>{
+  const blob=await shareBlob();if(!blob)return;
+  const file=new File([blob],'meu-mapa-da-alma.png',{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:'Meu Mapa da Alma',text:`Descobri que eu sou ${DERIVED.arqNome}. Faça o seu em ${CONFIG.SITE_URL}`});return;}catch(e){}
+  }
+  baixarCard();
+  $('shareHint').textContent='Seu aparelho não abre o compartilhamento direto — a imagem foi baixada. É só postar.';
+});
+function baixarCard(){
+  const a=document.createElement('a');a.href=$('shareCanvas').toDataURL('image/png');
+  a.download='MapaDaAlma_'+stripAccents(CURRENT.primeiro)+'.png';a.click();
+}
+$('shareDl').addEventListener('click',baixarCard);
+function goPay(kind){if(CONFIG.DEMO_MODE){unlock();return;}const url=kind==='pix'?CONFIG.PIX_URL:CONFIG.CARD_URL;if(url){window.location.href=url;return;}alert('Configure CONFIG.'+(kind==='pix'?'PIX_URL':'CARD_URL')+' ou deixe DEMO_MODE = true.');}
+$('payPix').addEventListener('click',()=>goPay('pix'));
+$('payCard').addEventListener('click',()=>goPay('card'));
+
+let couponTimer=null;
+function startCoupon(){
+  const code=CONFIG.COUPON_PREFIX+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  $('couponBox').textContent=code;let left=CONFIG.COUPON_MINUTES*60;clearInterval(couponTimer);
+  const tick=()=>{if(left<=0){clearInterval(couponTimer);$('timerBox').textContent='Oferta expirada — o valor volta a R$ 60,00.';$('couponBox').style.opacity=.4;return;}const mm=String(Math.floor(left/60)).padStart(2,'0'),ss=String(left%60).padStart(2,'0');$('timerBox').textContent='⏳ Desconto de R$15 válido por mais '+mm+':'+ss;left--;};
+  tick();couponTimer=setInterval(tick,1000);
+}
+$('buyPremium').addEventListener('click',()=>{if(CONFIG.DEMO_MODE||!CONFIG.PREMIUM_URL){alert('Modo demo: aqui o cliente iria para o checkout do Almanaque Minha História (R$45) com o cupom '+$('couponBox').textContent+' já aplicado. Configure CONFIG.PREMIUM_URL para produção.');return;}window.location.href=CONFIG.PREMIUM_URL+'?cupom='+encodeURIComponent($('couponBox').textContent);});
+
+$('gerar').addEventListener('click',gerar);
+const UF_ASK_HTML=$('ufAsk').innerHTML;
+$('reset').addEventListener('click',()=>{
+  $('result').style.display='none';$('unlocked').style.display='none';$('lockedZone').style.display='block';
+  clearInterval(couponTimer);
+  $('ufAsk').innerHTML=UF_ASK_HTML;
+  const s=$('uf');s.innerHTML='<option value="">Selecione…</option>';UFS.forEach(([v,n])=>{const o=document.createElement('option');o.value=v;o.textContent=n;s.appendChild(o);});
+  $('ufOk').addEventListener('click',ufConfirm);
+  $('sharePreview').style.display='none';
+  $('landing').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+});
+
+/* ============================ PDF ============================ */
+$('baixar').addEventListener('click',gerarPDF);
+function gerarPDF(){
+  const c=CURRENT,D=DERIVED;const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
+  const paper=[244,236,216],ink=[46,38,32],red=[143,45,45],navy=[35,57,91],gold=[176,141,63];const M=54;let y=0;
+  function bg(){doc.setFillColor(...paper);doc.rect(0,0,W,H,'F');doc.setDrawColor(...ink);doc.setLineWidth(1.4);doc.rect(24,24,W-48,H-48);doc.setLineWidth(.6);doc.rect(30,30,W-60,H-60);}
+  function need(h){if(y+h>H-70){doc.addPage();bg();y=80;}}
+  function head(t){need(52);doc.setFont('times','italic');doc.setFontSize(11);doc.setTextColor(...red);doc.text(t.toUpperCase(),M,y);y+=8;doc.setDrawColor(...ink);doc.setLineWidth(1.4);doc.line(M,y,W-M,y);y+=22;}
+  function para(t,size,color,font){doc.setFont('times',font||'normal');doc.setFontSize(size||12);doc.setTextColor(...(color||ink));const ls=doc.splitTextToSize(t,W-2*M);ls.forEach(l=>{need((size||12)+4);doc.text(l,M,y);y+=(size||12)+4;});}
+  function label(t){need(22);doc.setFont('times','bold');doc.setFontSize(13);doc.setTextColor(...navy);doc.text(t,M,y);y+=17;}
+
+  bg();doc.setFont('times','italic');doc.setFontSize(11);doc.setTextColor(...red);doc.text('ASTROLOGIA · NUMEROLOGIA · ZODÍACO CHINÊS',W/2,70,{align:'center'});
+  doc.setDrawColor(...ink);doc.setLineWidth(1.4);doc.line(M,82,W-M,82);
+  doc.setFont('times','bold');doc.setTextColor(...ink);doc.setFontSize(46);doc.text('Mapa da Alma',W/2,168,{align:'center'});
+  doc.setTextColor(...gold);doc.setFontSize(20);doc.text('✦   ❧   ✦',W/2,200,{align:'center'});
+  doc.setFont('times','italic');doc.setFontSize(15);doc.setTextColor(...ink);doc.text('O retrato de',W/2,250,{align:'center'});
+  doc.setFont('times','bold');doc.setFontSize(24);doc.setTextColor(...navy);doc.text(c.nome,W/2,284,{align:'center'});
+  doc.setDrawColor(...red);doc.setLineWidth(2);doc.circle(W/2,384,54);doc.setLineWidth(.8);doc.circle(W/2,384,60);
+  doc.setFont('times','bold');doc.setTextColor(...red);doc.setFontSize(15);doc.text(c.signo,W/2,378,{align:'center'});
+  doc.setFontSize(11);doc.setFont('times','normal');doc.text(c.elemento+' · '+c.animal,W/2,396,{align:'center'});
+  const dd=String(c.d).padStart(2,'0'),mm=String(c.m).padStart(2,'0');
+  const ufNome=(UFS.find(u=>u[0]===c.uf)||[])[1];
+  doc.setFont('times','italic');doc.setFontSize(12);doc.setTextColor(...ink);doc.text('nascido(a) em '+dd+'/'+mm+'/'+c.y+(ufNome?' · '+ufNome:''),W/2,478,{align:'center'});
+  doc.setFont('times','italic');doc.setFontSize(16);doc.setTextColor(...navy);doc.text('“'+D.arq[2]+'”',W/2,512,{align:'center'});
+  doc.setLineWidth(1.4);doc.setDrawColor(...ink);doc.line(M,H-70,W-M,H-70);doc.setFont('times','italic');doc.setFontSize(10);doc.setTextColor(...red);doc.text('Mapa da Alma',W/2,H-52,{align:'center'});
+
+  doc.addPage();bg();y=80;
+  head('Entre os doze, você é');
+  doc.setFont('times','bold');doc.setFontSize(30);doc.setTextColor(...navy);
+  doc.splitTextToSize(D.arqNome,W-2*M).forEach(l=>{doc.text(l,W/2,y+14,{align:'center'});y+=34;});
+  doc.setFont('times','italic');doc.setFontSize(14);doc.setTextColor(...ink);
+  doc.text('“'+D.arq[2]+'”',W/2,y+16,{align:'center'});y+=48;
+  head('Quem você é');
+  para(cap(c.primeiro)+', '+SIGNO[c.signo].desc,13,ink);y+=4;
+  para(NUM[c.lp].desc,12,ink);y+=4;
+  para('Como '+c.animal+' de '+c.elemento+', você é '+ANIMAL[c.animal].adj+'. Somando '+phrase(D.tt)+', '+sintese(D.tt)+'.',12,ink);y+=4;
+  para('A sua sombra mora onde mora a sua força. '+sombra(D.tt),12,ink,'italic');y+=8;
+  head('Você seria…');const[cn,ct]=D.char;label(cn);para(ct,12,ink,'italic');
+  head('As histórias que são a sua vida');
+  [['Filme',D.midia.filme],['Livro',D.midia.livro],['Série',D.midia.serie],['Novela',D.midia.novela],['Música',D.midia.musica]].forEach(([k,x])=>{label(k+': '+x.titulo);para('combina com '+phrase(x.why)+'.',11,ink,'italic');y+=2;});
+  head('Profissões em que você prospera');
+  D.profs.forEach(p=>{label('• '+p.nome);para('o encontro de '+phrase(p.why)+' aponta pra cá.',11,ink,'italic');y+=4;});
+  y+=4;head('Onde sua energia rema contra a maré');
+  (D.tt.filter(t=>EVITA[t]).slice(0,3).length?D.tt.filter(t=>EVITA[t]).slice(0,3):['liberdade']).forEach(t=>para('• '+cap(EVITA[t]||EVITA.liberdade)+'.',11,ink));
+  head('A carta que te rege');label(D.tarot[0]);para('Seu Caminho de Vida '+c.lp+' te coloca sob '+D.tarot[0]+': '+D.tarot[1]+'.',12,ink);
+  head('A época em que você teria brilhado');para('Você teria brilhado em '+D.ep+'. O encontro de '+phrase(D.tt)+' te colocaria no centro daquele mundo.',12,ink);
+  head('Superpoder & kryptonita');label('Superpoder');para(cap(SUPER[D.tt[0]]||'transformar ideias em movimento')+'.',12,ink);y+=2;label('Kryptonita');para(cap(KRYP[D.tt[0]]||'lembrar de desacelerar')+'.',12,ink);
+  head('Seu par ideal');const pr=PAR[c.signo]||[];para('Melhor sintonia com '+pr[0]+' e '+pr[1]+'. Com '+pr[2]+' mora o desafio delicioso: atração e atrito na mesma dose.',12,ink);
+  if(D.sobre){head('O significado do seu sobrenome');label(D.sobre.nome);para(D.sobre.texto,12,ink);}
+  head('Cor, número, dia & pedra da sorte');para('Cor: '+SIGNO[c.signo].cor+'    ·    Número: '+c.lp+'    ·    Dia: '+SIGNO[c.signo].dia+'    ·    Pedra: '+SIGNO[c.signo].pedra,13,navy,'bold');
+  head('A cor da sua época');para('No ano em que você nasceu, '+c.y+', o Brasil era presidido por '+presidente(c.y)+'.',12,ink);if(c.uf)para(regiao(c.uf),12,ink);
+
+  doc.save('MapaDaAlma_'+stripAccents(c.primeiro)+'.pdf');
+}
+</script>
+</body>
+</html>
