@@ -115,11 +115,14 @@ export async function enviarEmail({ para, assunto, html }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) return { ok: false, motivo: 'RESEND_API_KEY não configurada' };
   const remetente = process.env.EMAIL_REMETENTE || 'Mapa da Alma <onboarding@resend.dev>';
+  // O remetente é um endereço sem caixa de entrada. Quem responder precisa
+  // cair num e-mail que alguém lê de verdade.
+  const respostaPara = process.env.EMAIL_RESPOSTA || 'raquel.cibien@gmail.com';
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: remetente, to: [para], subject: assunto, html })
+      body: JSON.stringify({ from: remetente, to: [para], reply_to: respostaPara, subject: assunto, html })
     });
     const d = await r.json();
     return { ok: r.ok, resposta: d };
