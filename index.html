@@ -198,11 +198,26 @@
     <div class="card aguardando">
       <img class="selo" src="img/selo.png" alt=""/>
       <h2 id="aguardTitulo">Confirmando o seu pagamento…</h2>
-      <p id="aguardTexto">Assim que o Mercado Pago confirmar, o seu mapa abre sozinho nesta tela.</p>
-      <p>No Pix isso costuma levar alguns segundos.</p>
+      <p id="aguardTexto">Assim que o pagamento for confirmado, o seu mapa aparece aqui.</p>
       <div class="cod" id="aguardCodigo">—</div>
-      <p style="margin-top:18px;font-size:15px">Pode fechar esta página sem medo: <strong>enviamos o seu mapa por e-mail</strong> assim que o pagamento entrar.</p>
+      <p style="margin-top:18px;font-size:15px">Pode deixar esta página aberta — ou fechar, que <strong>o seu mapa vai por e-mail</strong> do mesmo jeito.</p>
       <button class="btn ghost" id="aguardVoltar" style="margin-top:18px;max-width:260px;display:inline-block">Fazer outro Mapa</button>
+    </div>
+  </section>
+
+
+  <!-- ================= PEDIDO DO ALMANAQUE CONFIRMADO ================= -->
+  <section id="almOk" style="display:none">
+    <div class="card aguardando">
+      <img class="selo" src="img/selo.png" alt="" style="animation:none"/>
+      <h2>Pedido confirmado</h2>
+      <p style="font-size:19px;color:var(--ink)">Recebemos o seu <strong>Almanaque Minha História</strong>.</p>
+      <div class="cod" id="almOkCodigo">—</div>
+      <hr class="rule" style="margin:26px 0"/>
+      <p style="font-size:18px">O seu Almanaque é <strong>pesquisado à mão</strong>, um por vez. Fica pronto em <strong>3 dias úteis</strong>.</p>
+      <p>Assim que estiver pronto, ele chega no seu e-mail. Se precisarmos de algum detalhe da sua história, falamos com você pelo WhatsApp que você informou<span id="almOkZap"></span>.</p>
+      <p style="margin-top:20px;font-size:15px">Guarde o código acima: é por ele que a gente encontra o seu pedido.</p>
+      <button class="btn ghost" id="almOkVoltar" style="margin-top:22px;max-width:280px;display:inline-block">Voltar ao meu Mapa</button>
     </div>
   </section>
 
@@ -322,7 +337,7 @@
               <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="seu@email.com"/>
             </div>
             <button class="btn red big" id="irPagar">Ir para o pagamento seguro</button>
-            <p class="privacidade">Usamos o seu e-mail só para entregar o mapa e o recibo.</p>
+            <p class="privacidade">Assim que o pagamento for confirmado, o seu mapa aparece nesta tela — e vai também para o seu e-mail, para você guardar.</p>
             <div class="erro-box" id="erroPay"></div>
           </div>
           <div class="guarantee">🛡️ <b>Não se identificou com o seu mapa? Devolvemos o seu dinheiro.</b><br/>Basta responder o e-mail da compra. Sem pergunta, sem formulário.</div>
@@ -413,6 +428,7 @@
             <div class="field"><label for="almEmail">E-mail</label><input id="almEmail" type="email" inputmode="email" autocomplete="email"/></div>
             <div class="field"><label for="almZap">WhatsApp com DDD</label><input id="almZap" type="tel" inputmode="tel" placeholder="(11) 91234-5678"/></div>
             <div class="field"><label for="almObs">Algo que não pode faltar na sua história? (opcional)</label><textarea id="almObs" rows="3"></textarea></div>
+            <p style="font-size:14px;opacity:.85;font-style:italic;margin:14px 0 6px">A confirmação do seu pedido chega por e-mail.</p>
             <button class="btn gold big" id="almEnviar">Ir para o pagamento</button>
             <div class="erro-box" id="almErro"></div>
           </div>
@@ -588,6 +604,7 @@ async function consultarStatus(token,tentativa){
     if(d.codigo)$('aguardCodigo').textContent='Pedido '+d.codigo;
     if(d.status==='pago'){
       paraPolling();
+      if(d.tipo==='almanaque'){mostrarAlmanaqueOk(d);return;}
       TOKEN=token;
       abrirConteudo(d.perfil,d.cupom);
       return;
@@ -599,8 +616,8 @@ async function consultarStatus(token,tentativa){
       return;
     }
     if(tentativa>90){
-      $('aguardTitulo').textContent='Ainda não confirmou';
-      $('aguardTexto').textContent='O Pix às vezes demora um pouco mais. Pode fechar esta página: assim que entrar, o seu mapa vai por e-mail.';
+      $('aguardTitulo').textContent='Confirmação a caminho';
+      $('aguardTexto').textContent='Pode fechar esta página: o seu mapa vai por e-mail assim que o pagamento for confirmado.';
       paraPolling();
     }
   }catch(e){/* tenta de novo no próximo ciclo */}
@@ -619,6 +636,23 @@ function iniciarPolling(token){
   consultarStatus(token,t);
   POLL=setInterval(()=>{t++;consultarStatus(token,t);},3000);
 }
+
+/* ---------- confirmação do pedido do Almanaque ---------- */
+function mostrarAlmanaqueOk(d){
+  $('almOkCodigo').textContent='Pedido '+d.codigo;
+  $('almOkZap').textContent=d.whatsapp?' ('+d.whatsapp+')':'';
+  $('landing').style.display='none';
+  $('result').style.display='none';
+  $('aguardando').style.display='none';
+  $('almOk').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('almOkVoltar').addEventListener('click',()=>{
+  $('almOk').style.display='none';
+  let t=null;try{t=localStorage.getItem('mapa_token');}catch(e){}
+  if(t){history.replaceState({},'','/?pedido='+t);iniciarPolling(t);}
+  else{recomeçar();}
+});
 
 /* ---------- conteúdo pago (vem do servidor) ---------- */
 function abrirConteudo(perfil,cupom){
@@ -768,7 +802,7 @@ function recomeçar(){
   try{localStorage.removeItem('mapa_token');}catch(e){}
   history.replaceState({},'', '/');
   PERFIL=null;TOKEN=null;
-  $('result').style.display='none';$('aguardando').style.display='none';
+  $('result').style.display='none';$('aguardando').style.display='none';$('almOk').style.display='none';
   $('unlocked').style.display='none';$('lockedZone').style.display='block';
   $('payOpts').style.display='';$('payStep').style.display='none';
   $('sharePreview').style.display='none';$('almForm').style.display='none';
