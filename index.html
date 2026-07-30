@@ -142,6 +142,12 @@
   .arq-reveal .lbl{font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--red)}
   .arq-reveal .nome{font-family:"Playfair Display",serif;font-size:clamp(30px,7vw,46px);color:var(--navy);line-height:1.05;margin:8px 0 4px}
   .arq-reveal .lema{font-style:italic;font-size:clamp(17px,3.4vw,21px);color:var(--ink-soft);margin:0}
+  .raiz{background:linear-gradient(180deg,#f9f0d8,#efe0be);border:2px solid var(--gold);text-align:center;padding:22px 20px;margin:18px 0 4px;
+    box-shadow:0 8px 24px rgba(60,45,20,.12)}
+  .raiz .lbl{font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--red)}
+  .raiz .nome{font-family:"Playfair Display",serif;font-size:clamp(28px,6.4vw,42px);color:var(--navy);line-height:1.08;margin:6px 0 2px}
+  .raiz .valor{font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
+  .raiz .txt{font-size:18px;color:var(--ink);margin:0;text-align:left}
   .barnum{background:#fbf6e7;border-left:4px solid var(--red);padding:14px 18px;margin:16px 0 4px;font-style:italic;font-size:19px}
   .barnum .tag{display:block;font-family:"Special Elite",monospace;font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
   /* ancoragem de preço */
@@ -188,6 +194,23 @@
   @media (max-width:560px){.signo-grid,.steps{grid-template-columns:1fr}.twocol,.quotes,.reveal-grid{grid-template-columns:1fr}.luck{grid-template-columns:1fr 1fr}.pay-opts{flex-direction:column}
     .hero-orn{margin:-4px auto -10px}}
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1685530262744336');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <div class="wrap">
@@ -297,6 +320,13 @@
       </div>
       <div class="prose"><p class="lead" id="rTeaser">—</p></div>
 
+
+      <div class="raiz" id="rRaiz">
+        <div class="lbl">A sua raiz brasileira</div>
+        <div class="nome" id="rRaizNome">—</div>
+        <div class="valor" id="rRaizValor">—</div>
+        <p class="txt" id="rRaizTxt">—</p>
+      </div>
       <div class="barnum" id="rBarnum"><span class="tag">O que os seus números entregam de você</span><span id="rBarnumTxt">—</span></div>
 
       <!-- CURIOSITY GAP -->
@@ -448,6 +478,22 @@ const CONFIG = {
   LAUNCH_TEXT: "Oferta de lançamento — o mapa completo por R$ 9,99"
 };
 
+
+/* ===== RASTREAMENTO (Meta Pixel) =====
+   Purchase só dispara no pagamento CONFIRMADO pelo servidor, e uma única vez
+   por pedido — se a pessoa recarregar a página, não conta venda de novo. */
+function fbTrack(evento,dados){
+  try{ if(window.fbq) fbq('track',evento,dados||undefined); }catch(e){}
+}
+function fbTrackUmaVez(chave,evento,dados){
+  try{
+    const k='fb_'+evento+'_'+chave;
+    if(localStorage.getItem(k))return;
+    localStorage.setItem(k,'1');
+  }catch(e){/* sem localStorage: melhor contar do que perder */}
+  fbTrack(evento,dados);
+}
+
 /* ---------- utilidades ---------- */
 function stripAccents(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ç/gi,'c');}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
@@ -476,6 +522,49 @@ const ANIMAL={"Rato":{"tags":["esperteza","estrategia","sobrevivencia"],"adj":"e
 const ELEM={"Metal":["disciplina","ambicao","resiliencia"],"Água":["intuicao","sensibilidade","versatilidade"],"Madeira":["crescimento","etica","cuidado"],"Fogo":["paixao","carisma","acao"],"Terra":["estabilidade","cuidado","tradicao"]};
 const BARNUM={"poder":["Você já foi chamado de “controlador” por gente que não tinha ideia do peso que você estava segurando sozinho.","Delegar te dá mais trabalho do que fazer — e você sabe que isso um dia vai te cobrar caro."],"lideranca":["Você já assumiu a frente de alguma coisa sem ninguém pedir, e depois se perguntou por que sempre sobra pra você.","Em qualquer grupo, você percebe rápido demais quando ninguém está conduzindo — e o silêncio te incomoda até você agir."],"ambicao":["Você conquista uma coisa e leva mais ou menos dois dias para se sentir insatisfeito de novo.","Existe uma versão sua de dez anos à frente que você persegue em silêncio, sem contar pra quase ninguém."],"visao":["Você já explicou uma ideia e ouviu “não vai dar certo” de gente que, três anos depois, estava fazendo exatamente aquilo.","Você enxerga o final de algumas histórias no começo — e cansa de esperar os outros chegarem lá."],"inovacao":["Frases como “sempre foi assim” causam em você uma irritação física, quase involuntária.","Você já reinventou do zero uma coisa que estava funcionando, só porque dava pra ser melhor."],"rebeldia":["Você obedece regras que fazem sentido e trava com as que não fazem — e isso já te custou alguma coisa.","Te dizerem “porque sim” funciona com você exatamente ao contrário."],"palavra":["As pessoas te contam coisas que não deviam contar — e você nem precisou perguntar.","Você já ganhou uma discussão e saiu com a sensação estranha de que talvez não devesse ter ganhado."],"carisma":["Você entra num lugar e sente o clima mudar — e finge que não percebeu.","Muita gente acha que te conhece bem. Pouquíssimas conhecem."],"palco":["Você diz que não liga para reconhecimento, mas lembra com precisão da última vez que passou despercebido.","Quando você fala, as pessoas param — e isso te agrada mais do que você admite em voz alta."],"coragem":["Você já tomou uma decisão grande no impulso e, olhando pra trás, faria de novo.","Enquanto os outros pesam prós e contras, você já está do outro lado — às vezes cedo demais."],"acao":["Esperar te cansa mais do que trabalhar.","Você prefere resolver errado hoje do que resolver certo daqui a um mês."],"impeto":["Você já mandou uma mensagem que releu depois e pensou: podia ter esperado uma hora.","Sua primeira reação costuma ser a verdadeira — e a segunda, a educada."],"analise":["Você já reescreveu três vezes uma mensagem de duas linhas.","“Bom o suficiente” é uma expressão que você entende, mas não sente."],"estrategia":["Você já sabia o final daquela situação semanas antes de ela acontecer — e não falou nada.","Você guarda informação não por segredo, mas porque sabe que a hora certa vale mais."],"disciplina":["Você termina o que começou mesmo quando já perdeu a vontade — e chama isso de caráter.","Suas próprias regras já te prenderam mais do que qualquer chefe."],"resiliencia":["Você já se levantou de uma coisa que teria derrubado gente que você conhece — e quase ninguém soube.","Você pede ajuda tarde. Sempre tarde demais."],"intuicao":["Você já soube que uma pessoa não prestava antes de ter um único motivo concreto — e estava certo.","Quando o instinto e os fatos brigam dentro de você, o instinto costuma ganhar. E costuma acertar."],"sensibilidade":["Você já levou pro pessoal uma coisa que nem era com você — e ficou dias com aquilo.","Você sente o humor dos outros entrando em você, como se fosse seu."],"arte":["Você repara em detalhes de beleza que as pessoas ao seu lado simplesmente não veem.","Ambientes feios e frios te esgotam de um jeito que você tem dificuldade de explicar."],"sonho":["Você tem uma vida inteira acontecendo na sua cabeça que quase ninguém conhece.","Você já se pegou emocionado com uma cena que nem chegou a acontecer."],"misterio":["As pessoas te acham difícil de ler — e você deixa que achem.","Você conta a sua história em pedaços, e escolhe com cuidado quem recebe cada um."],"intensidade":["Você já foi chamado de “intenso demais” — e no fundo achou graça.","Você não sente as coisas pela metade. Nunca conseguiu."],"cuidado":["Você cuida de todo mundo e trava na hora de aceitar que cuidem de você.","Você lembra de datas, alergias e manias dos outros — e ninguém lembra das suas."],"familia":["Você mede as suas decisões grandes pelo efeito que elas teriam em duas ou três pessoas específicas.","Tem uma pessoa da sua família que você protege sem nunca ter combinado isso com ninguém."],"servico":["Você diz “sim” antes de conferir se tem tempo — e depois dá um jeito.","Você se sente estranhamente culpado quando descansa."],"justica":["Você não consegue deixar passar uma injustiça pequena, mesmo quando ela não é sua.","Você já brigou por alguém que nem ficou sabendo."],"liberdade":["Você já recusou uma coisa boa só porque vinha com corrente junto.","A ideia de dever satisfação a alguém te sufoca mais do que a própria obrigação."],"aventura":["A rotina te dá um cansaço que o esforço nunca deu.","Você já mudou de rumo sem plano B e se saiu bem — o que só piorou o hábito."],"versatilidade":["Você é bom em coisas demais, e isso já te atrapalhou na hora de escolher uma.","As pessoas te descrevem de formas completamente diferentes umas das outras. Todas estão certas."],"filosofia":["Você tem perguntas que carrega há anos e nunca falou em voz alta.","Você já perdeu uma noite de sono com um pensamento que não tinha nenhuma urgência prática."],"tradicao":["Você guarda um objeto sem valor nenhum só porque foi de alguém.","Você respeita o que veio antes — e desconfia de quem quer jogar tudo fora."],"diplomacia":["Você percebe uma tensão na sala antes de qualquer palavra ser dita, e já está calculando como desarmar.","Você absorve o desconforto dos outros para o ambiente ficar em paz. E raramente alguém faz isso por você."],"harmonia":["Você adia conversas difíceis mais tempo do que devia, esperando que se resolvam sozinhas.","Um clima ruim no ambiente estraga o seu dia inteiro."],"precisao":["Um detalhe torto na tela te incomoda até você arrumar.","Você já refez um trabalho inteiro por causa de uma coisa que ninguém teria notado."],"generosidade":["Você dá mais do que pode e chama isso de normal.","Você já ficou sem para alguém não ficar sem — e não contou pra ninguém."],"lealdade":["Você tem pouquíssimas pessoas de verdade, e por elas você faz qualquer coisa.","Traição é a única coisa que você não consegue relevar."],"otimismo":["Você acha jeito onde os outros já desistiram — e às vezes te chamam de ingênuo por isso.","Você segura o astral de gente que nem sabe que você está segurando."],"sensualidade":["Você repara em textura, cheiro e sabor mais do que a maioria das pessoas ao seu redor.","Prazer, pra você, nunca foi supérfluo."],"curiosidade":["Você já passou quarenta minutos pesquisando uma coisa que não tinha a menor importância.","Você começa mais coisas do que termina — e não é preguiça, é apetite."],"esperteza":["Você sempre acha a saída, mesmo quando a porta está fechada.","Você percebe a intenção por trás do que as pessoas falam, não o que elas falam."],"sinceridade":["Você é péssimo em fingir que gostou.","As pessoas te procuram quando querem a verdade, e evitam você quando querem consolo."],"franqueza":["Você já falou uma verdade necessária na hora errada.","Sua sinceridade já foi confundida com falta de educação por gente que não te conhece."],"inspiracao":["Você já mudou o rumo de alguém com uma frase que nem lembra ter dito.","As pessoas saem de perto de você com mais vontade de fazer as coisas."],"crescimento":["Você não consegue ficar dois anos sendo a mesma pessoa.","Você mede a sua vida pelo quanto aprendeu, não pelo quanto acumulou."],"etica":["Você já perdeu uma oportunidade por não conseguir passar por cima de alguém.","Existe uma linha que você não cruza, mesmo quando ninguém está vendo."],"estabilidade":["Você precisa de chão firme para arriscar — e as pessoas confundem isso com medo.","Você é a pessoa em quem os outros se apoiam quando tudo balança."],"paixao":["Você não sabe se envolver pela metade em nada que importe.","Quando você quer, você quer inteiro — e isso já assustou alguém."],"independencia":["Você prefere carregar sozinho a dever favor.","Você aprendeu cedo que contar com você mesmo dava menos decepção."],"sobrevivencia":["Você já se virou em situação que gente com mais recurso não teria aguentado.","Você tem um instinto pra perigo que os outros só entendem depois."]};
 
+
+
+/* ===== A SUA RAIZ BRASILEIRA (13 arquétipos) =====
+   Aparece na prévia gratuita: é o elemento que nenhum outro site tem.
+   [nome, artigo, valor, tags, texto] */
+const RAIZ = [
+  ['Malandro','do','Astúcia',['esperteza','versatilidade','carisma','sobrevivencia','estrategia'],
+   'Você acha a saída quando a porta está fechada. Não por sorte: você lê a situação antes dela acontecer, e sabe que jeitinho bem-dado é uma forma de inteligência. O risco é confiar tanto na improvisação que você deixa de construir o que dá trabalho.',0.3803],
+  ['Cangaceiro','do','Coragem',['coragem','rebeldia','lideranca','poder','justica','impeto'],
+   'Você não abaixa a cabeça para quem não merece. Quando algo te parece injusto, você age — e arrasta gente com você, mesmo sem ter pedido para liderar. A conta vem no cansaço de quem nunca se permite recuar.',0.3086],
+  ['Benzedeira','da','Cura',['cuidado','intuicao','sensibilidade','servico','generosidade'],
+   'As pessoas saem de perto de você mais leves do que chegaram, e quase nunca sabem explicar por quê. Você sente o que não foi dito e cuida antes de ser chamado. O que falta é lembrar que você também precisa de colo.',0.219],
+  ['Tropeiro','do','Adaptação',['aventura','resiliencia','versatilidade','independencia','liberdade'],
+   'Você se ajusta a qualquer terreno e não perde o rumo por causa de imprevisto. Estrada nova não te assusta: te acorda. O perigo é seguir viagem para não ter que ficar e resolver.',0.2534],
+  ['Vaqueiro','do','Perseverança',['disciplina','resiliencia','estabilidade','etica','sobrevivencia','lealdade'],
+   'Você termina o que começa mesmo depois que a vontade acabou. Não faz barulho, não pede plateia, e é em você que os outros se apoiam quando tudo balança. O preço é aguentar mais do que devia antes de pedir ajuda.',0.345],
+  ['Capoeirista','do','Equilíbrio',['harmonia','diplomacia','esperteza','crescimento','acao'],
+   'Você desarma tensão com jogo de corpo, não com força. Sabe recuar para avançar melhor, e transforma conflito em movimento. Quem não te conhece confunde a sua ginga com falta de posição.',0.5634],
+  ['Caipira Sábio','do','Simplicidade',['filosofia','tradicao','sinceridade','estabilidade','familia'],
+   'Você desconfia de conversa complicada e acerta com frases curtas. Aprendeu com quem veio antes e não tem pressa de jogar fora o que funciona. Às vezes o mundo te chama de atrasado justamente quando você está certo.',0.4053],
+  ['Artesã','da','Criatividade',['arte','precisao','inovacao','analise','sonho'],
+   'Você repara no detalhe que ninguém vê e não descansa até ele ficar no lugar. Faz com a mão o que a maioria só imagina. A armadilha é refazer para sempre uma coisa que já estava boa.',0.3878],
+  ['Pescador','do','Paciência',['analise','misterio','intuicao','precisao','estabilidade'],
+   'Você sabe esperar o tempo certo e desconfia de pressa. Observa muito antes de agir, e quando age raramente erra. Mas há coisas na sua vida que estão esperando há tempo demais.',0.3696],
+  ['Mateiro','do','Exploração',['curiosidade','aventura','visao','ambicao','coragem'],
+   'Você entra onde não tem trilha e volta sabendo o caminho. Enxerga o fim da história quando os outros ainda estão no começo, e cansa de esperar que cheguem lá. O difícil é aceitar companhia num ritmo mais lento que o seu.',0.4008],
+  ['Carnavalesco','do','Alegria e conexão',['palco','carisma','otimismo','sensualidade','inspiracao'],
+   'Você entra num lugar e o clima muda. Junta gente que não se conhecia e faz parecer fácil, quando é trabalho. Poucos percebem quanto você segura por dentro para manter a festa de pé.',0.4896],
+  ['Repentista','do','A palavra',['palavra','franqueza','inspiracao','esperteza','palco'],
+   'Você responde antes de pensar e acerta. A palavra é a sua arma e o seu abrigo, e você já mudou o rumo de alguém com uma frase que nem lembra ter dito. O outro lado é a verdade que sai na hora errada.',0.7621],
+  ['Seresteiro','do','Saudade',['sensibilidade','paixao','arte','sonho','intensidade'],
+   'Você sente as coisas inteiras, nunca pela metade, e guarda com cuidado o que já passou. Transforma falta em beleza. Mas há uma diferença entre honrar a saudade e morar dentro dela.',0.3248]
+];
+
+function escolherRaiz(w,seed){
+  // o fator (índice 5) equaliza a distribuição: sem ele, uma em cada quatro
+  // pessoas cairia na Benzedeira e o Repentista quase nunca sairia
+  const notas=RAIZ.map(r=>[r,r[3].reduce((s,t)=>s+(w[t]||0),0)*r[5]]);
+  const max=Math.max(...notas.map(n=>n[1]));
+  // empate é comum: a semente decide, sempre igual para a mesma pessoa
+  const pool=notas.filter(n=>Math.abs(n[1]-max)<1e-9).map(n=>n[0]);
+  return pool[seed%pool.length];
+}
 
 function buildTags(c){
   const comps=[{tags:SIGNO[c.signo].tags,kind:'signo'},{tags:NUM[c.lp].tags,kind:'num'},{tags:(NUM[c.exp]||{tags:[]}).tags,kind:'exp'},{tags:ANIMAL[c.animal].tags,kind:'animal'},{tags:ELEM[c.elemento],kind:'elem'}];
@@ -519,8 +608,9 @@ function gerar(){
   const primeiro=nome.split(/\s+/)[0];
   CURRENT={nome,primeiro,y,m,d,signo:zodiac(m,d),animal:chineseAnimal(y,m,d),elemento:chineseElement(y,m,d),lp:lifePath(y,m,d),exp:expression(primeiro)};
   const w=buildTags(CURRENT);
-  PREVIA={tt:topTags(w,3),seed:seedNum(CURRENT)};
+  PREVIA={tt:topTags(w,3),seed:seedNum(CURRENT),w};
   renderPrevia();
+  fbTrack('ViewContent');
 }
 
 function renderPrevia(){
@@ -531,6 +621,11 @@ function renderPrevia(){
   $('rCaminho').textContent=c.lp;
   $('rTeaser').innerHTML=`<span class="drop">${c.primeiro[0]}</span>${c.primeiro}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
   $('rBarnumTxt').textContent=barnumFrase(c,PREVIA.tt,PREVIA.seed);
+
+  const raiz=escolherRaiz(PREVIA.w||buildTags({...c,exp:expression(c.primeiro)}),PREVIA.seed);
+  $('rRaizNome').textContent='Você tem a alma '+raiz[1]+' '+raiz[0];
+  $('rRaizValor').textContent='✦ '+raiz[2]+' ✦';
+  $('rRaizTxt').textContent=raiz[4];
 
   // Os valores reais NÃO estão no navegador. Os blocos têm tamanho variável
   // por pessoa só para parecerem o que são: um texto escondido.
@@ -575,6 +670,7 @@ $('irPagar').addEventListener('click',async()=>{
     const d=await r.json();
     if(!r.ok||!d.link){box.textContent=d.erro||'Não conseguimos abrir o pagamento. Tente de novo.';btn.classList.remove('carregando');btn.textContent='Ir para o pagamento seguro';return;}
     try{localStorage.setItem('mapa_token',d.token);}catch(e){}
+    fbTrack('InitiateCheckout',{value:9.99,currency:'BRL',content_name:'Mapa da Alma'});
     window.location.href=d.link;
   }catch(e){
     box.textContent='Sem conexão com o servidor. Tente de novo.';
@@ -598,8 +694,12 @@ async function consultarStatus(token,tentativa){
     if(d.codigo)$('aguardCodigo').textContent='Pedido '+d.codigo;
     if(d.status==='pago'){
       paraPolling();
-      if(d.tipo==='almanaque'){mostrarAlmanaqueOk(d);return;}
+      if(d.tipo==='almanaque'){
+        fbTrackUmaVez(token,'Purchase',{value:d.valor,currency:'BRL',content_name:'Almanaque Minha Historia'});
+        mostrarAlmanaqueOk(d);return;
+      }
       TOKEN=token;
+      fbTrackUmaVez(token,'Purchase',{value:9.99,currency:'BRL',content_name:'Mapa da Alma'});
       abrirConteudo(d.perfil,d.cupom);
       return;
     }
@@ -654,7 +754,7 @@ function abrirConteudo(perfil,cupom){
   const b=perfil.base;
   CURRENT={nome:b.nome,primeiro:b.primeiro,y:b.y,m:b.m,d:b.d,signo:b.signo,animal:b.animal,elemento:b.elemento,lp:b.lp};
   const w=buildTags({...CURRENT,exp:expression(b.primeiro)});
-  PREVIA={tt:topTags(w,3),seed:seedNum(CURRENT)};
+  PREVIA={tt:topTags(w,3),seed:seedNum(CURRENT),w};
 
   renderPrevia();
   $('lockedZone').style.display='none';
@@ -782,6 +882,7 @@ $('almEnviar').addEventListener('click',async()=>{
     });
     const d=await r.json();
     if(!r.ok||!d.link){box.textContent=d.erro||'Não conseguimos abrir o pagamento.';btn.classList.remove('carregando');btn.textContent='Ir para o pagamento';return;}
+    fbTrack('InitiateCheckout',{value:d.valor,currency:'BRL',content_name:'Almanaque Minha Historia'});
     window.location.href=d.link;
   }catch(e){
     box.textContent='Sem conexão com o servidor. Tente de novo.';
