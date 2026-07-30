@@ -1039,9 +1039,15 @@ function gerarPDF(){
   doc.text('ASTROLOGIA · NUMEROLOGIA · ZODÍACO CHINÊS',W/2,70,{align:'center'});
   doc.setDrawColor(...ink);doc.setLineWidth(1.4);doc.line(M,82,W-M,82);
   doc.setFont('times','bold');doc.setTextColor(...ink);doc.setFontSize(46);doc.text('Mapa da Alma',W/2,168,{align:'center'});
-  doc.setTextColor(...gold);doc.setFontSize(20);doc.text('✦   ❧   ✦',W/2,200,{align:'center'});
+  doc.setTextColor(...gold);doc.setFontSize(20);doc.text('·   ·   ·',W/2,200,{align:'center'});
   doc.setFont('times','italic');doc.setFontSize(15);doc.setTextColor(...ink);doc.text('O retrato de',W/2,250,{align:'center'});
-  doc.setFont('times','bold');doc.setFontSize(24);doc.setTextColor(...navy);doc.text(b.nome,W/2,284,{align:'center'});
+  doc.setFont('times','bold');doc.setTextColor(...navy);
+  (function(){
+    let s=24;
+    doc.setFontSize(s);
+    while(doc.getTextWidth(b.nome)>W-2*M-20 && s>11){ s-=1; doc.setFontSize(s); }
+    doc.text(b.nome,W/2,284,{align:'center',maxWidth:W-2*M-20});
+  })();
   doc.setDrawColor(...red);doc.setLineWidth(2);doc.circle(W/2,384,54);doc.setLineWidth(.8);doc.circle(W/2,384,60);
   doc.setFont('times','bold');doc.setTextColor(...red);doc.setFontSize(15);doc.text(b.signo,W/2,378,{align:'center'});
   doc.setFontSize(11);doc.setFont('times','normal');doc.text(b.elemento+' · '+b.animal,W/2,396,{align:'center'});
@@ -1062,7 +1068,7 @@ function gerarPDF(){
     doc.setFont('times','bold');doc.setFontSize(30);doc.setTextColor(...navy);
     doc.splitTextToSize((A.artigo==='da'?'A ':'O ')+A.nome,W-2*M).forEach(l=>{doc.text(l,W/2,y+14,{align:'center'});y+=34;});
     doc.setFont('times','italic');doc.setFontSize(13);doc.setTextColor(...red);
-    doc.text('✦ '+A.valor+' ✦',W/2,y+14,{align:'center'});y+=34;
+    doc.text('· '+A.valor.toUpperCase()+' ·',W/2,y+14,{align:'center'});y+=34;
     para(A.texto,12,ink);
     if(A.porque){y+=4;para(A.porque,11,ink,'italic');}
     y+=6;para('São figuras da história e da cultura popular brasileira — tipos do nosso povo, não entidades.',10,ink,'italic');
@@ -1114,7 +1120,19 @@ function gerarPDF(){
   para('No ano em que você nasceu, '+b.y+', o Brasil era presidido por '+P.nostalgia.presidente+'.',12,ink);
   if(P.nostalgia.regiao)para(P.nostalgia.regiao,12,ink);
 
-  doc.save('MapaDaAlma_'+stripAccents(b.primeiro)+'.pdf');
+  // doc.save() às vezes abre o PDF em vez de baixar, e o Chrome reclama de conexão.
+  // Blob + link com atributo download é o caminho confiável.
+  const arquivo='MapaDaAlma_'+stripAccents(b.primeiro).replace(/[^A-Za-z0-9]/g,'')+'.pdf';
+  try{
+    const blob=doc.output('blob');
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=arquivo; a.rel='noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),4000);
+  }catch(e){
+    doc.save(arquivo);
+  }
 }
 
 </script>
