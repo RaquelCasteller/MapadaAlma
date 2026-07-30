@@ -184,6 +184,112 @@ function analisaSobrenome(nomeCompleto){
   return null;
 }
 
+/* ===== A SUA RAIZ BRASILEIRA (13 arquétipos) =====
+   Aparece na prévia gratuita: é o elemento que nenhum outro site tem.
+   [nome, artigo, valor, tags, texto] */
+const RAIZ = [
+  ['Malandro','do','Astúcia',['esperteza','versatilidade','carisma','sobrevivencia','estrategia'],
+   'Você acha a saída quando a porta está fechada. Não por sorte: você lê a situação antes dela acontecer, e sabe que jeitinho bem-dado é uma forma de inteligência. O risco é confiar tanto na improvisação que você deixa de construir o que dá trabalho.',0.3803],
+  ['Cangaceiro','do','Coragem',['coragem','rebeldia','lideranca','poder','justica','impeto'],
+   'Você não abaixa a cabeça para quem não merece. Quando algo te parece injusto, você age — e arrasta gente com você, mesmo sem ter pedido para liderar. A conta vem no cansaço de quem nunca se permite recuar.',0.3086],
+  ['Benzedeira','da','Cura',['cuidado','intuicao','sensibilidade','servico','generosidade'],
+   'As pessoas saem de perto de você mais leves do que chegaram, e quase nunca sabem explicar por quê. Você sente o que não foi dito e cuida antes de ser chamado. O que falta é lembrar que você também precisa de colo.',0.219],
+  ['Tropeiro','do','Adaptação',['aventura','resiliencia','versatilidade','independencia','liberdade'],
+   'Você se ajusta a qualquer terreno e não perde o rumo por causa de imprevisto. Estrada nova não te assusta: te acorda. O perigo é seguir viagem para não ter que ficar e resolver.',0.2534],
+  ['Vaqueiro','do','Perseverança',['disciplina','resiliencia','estabilidade','etica','sobrevivencia','lealdade'],
+   'Você termina o que começa mesmo depois que a vontade acabou. Não faz barulho, não pede plateia, e é em você que os outros se apoiam quando tudo balança. O preço é aguentar mais do que devia antes de pedir ajuda.',0.345],
+  ['Capoeirista','do','Equilíbrio',['harmonia','diplomacia','esperteza','crescimento','acao'],
+   'Você desarma tensão com jogo de corpo, não com força. Sabe recuar para avançar melhor, e transforma conflito em movimento. Quem não te conhece confunde a sua ginga com falta de posição.',0.5634],
+  ['Caipira Sábio','do','Simplicidade',['filosofia','tradicao','sinceridade','estabilidade','familia'],
+   'Você desconfia de conversa complicada e acerta com frases curtas. Aprendeu com quem veio antes e não tem pressa de jogar fora o que funciona. Às vezes o mundo te chama de atrasado justamente quando você está certo.',0.4053],
+  ['Artesã','da','Criatividade',['arte','precisao','inovacao','analise','sonho'],
+   'Você repara no detalhe que ninguém vê e não descansa até ele ficar no lugar. Faz com a mão o que a maioria só imagina. A armadilha é refazer para sempre uma coisa que já estava boa.',0.3878],
+  ['Pescador','do','Paciência',['analise','misterio','intuicao','precisao','estabilidade'],
+   'Você sabe esperar o tempo certo e desconfia de pressa. Observa muito antes de agir, e quando age raramente erra. Mas há coisas na sua vida que estão esperando há tempo demais.',0.3696],
+  ['Mateiro','do','Exploração',['curiosidade','aventura','visao','ambicao','coragem'],
+   'Você entra onde não tem trilha e volta sabendo o caminho. Enxerga o fim da história quando os outros ainda estão no começo, e cansa de esperar que cheguem lá. O difícil é aceitar companhia num ritmo mais lento que o seu.',0.4008],
+  ['Carnavalesco','do','Alegria e conexão',['palco','carisma','otimismo','sensualidade','inspiracao'],
+   'Você entra num lugar e o clima muda. Junta gente que não se conhecia e faz parecer fácil, quando é trabalho. Poucos percebem quanto você segura por dentro para manter a festa de pé.',0.4896],
+  ['Repentista','do','A palavra',['palavra','franqueza','inspiracao','esperteza','palco'],
+   'Você responde antes de pensar e acerta. A palavra é a sua arma e o seu abrigo, e você já mudou o rumo de alguém com uma frase que nem lembra ter dito. O outro lado é a verdade que sai na hora errada.',0.7621],
+  ['Seresteiro','do','Saudade',['sensibilidade','paixao','arte','sonho','intensidade'],
+   'Você sente as coisas inteiras, nunca pela metade, e guarda com cuidado o que já passou. Transforma falta em beleza. Mas há uma diferença entre honrar a saudade e morar dentro dela.',0.3248]
+];
+
+function escolherRaiz(w,seed){
+  // o fator (índice 5) equaliza a distribuição: sem ele, uma em cada quatro
+  // pessoas cairia na Benzedeira e o Repentista quase nunca sairia
+  const notas=RAIZ.map(r=>[r,r[3].reduce((s,t)=>s+(w[t]||0),0)*r[5]]);
+  const max=Math.max(...notas.map(n=>n[1]));
+  // empate é comum: a semente decide, sempre igual para a mesma pessoa
+  const pool=notas.filter(n=>Math.abs(n[1]-max)<1e-9).map(n=>n[0]);
+  return pool[seed%pool.length];
+}
+
+
+/* ===== POR QUE ESTE ARQUÉTIPO ===== 
+   Nomeia os traços que levaram à escolha e de onde cada um veio.
+   Cita no máximo dois: três já viram relatório e matam o efeito. */
+const SUBST={
+ acao:'a pressa de resolver',ambicao:'a ambição',analise:'o rigor',arte:'o olhar para a beleza',
+ aventura:'o gosto pela estrada',carisma:'o carisma',coragem:'a coragem',crescimento:'a inquietação',
+ cuidado:'o cuidado com os outros',curiosidade:'a curiosidade',diplomacia:'o jogo de cintura',
+ disciplina:'a disciplina',esperteza:'a esperteza',estabilidade:'a firmeza',estrategia:'a estratégia',
+ etica:'a retidão',familia:'o apego à família',filosofia:'a vontade de entender',franqueza:'a franqueza',
+ generosidade:'a generosidade',harmonia:'a busca de harmonia',impeto:'o ímpeto',
+ independencia:'a independência',inovacao:'a vontade de reinventar',inspiracao:'o poder de inspirar',
+ intensidade:'a intensidade',intuicao:'a intuição',justica:'o senso de justiça',lealdade:'a lealdade',
+ liberdade:'a sede de liberdade',lideranca:'a liderança',misterio:'o mistério',otimismo:'o otimismo',
+ paixao:'a paixão',palavra:'o domínio da palavra',palco:'a presença',poder:'a força de vontade',
+ precisao:'a precisão',rebeldia:'a rebeldia',resiliencia:'a resiliência',sensibilidade:'a sensibilidade',
+ sensualidade:'o prazer pelas coisas',servico:'a entrega aos outros',sinceridade:'a sinceridade',
+ sobrevivencia:'o instinto de sobrevivência',sonho:'o sonho',tradicao:'o respeito ao que veio antes',
+ versatilidade:'a versatilidade',visao:'a visão de longe'
+};
+const ART_ANIMAL={Rato:'do',Boi:'do',Tigre:'do',Coelho:'do',Dragão:'do',Serpente:'da',
+ Cavalo:'do',Cabra:'da',Macaco:'do',Galo:'do','Cão':'do',Porco:'do'};
+const ART_ELEM={Metal:'do',Água:'da',Madeira:'da',Fogo:'do',Terra:'da'};
+
+function origemLabel(kind,c){
+  if(kind==='signo')return 'de '+c.signo;
+  if(kind==='animal')return (ART_ANIMAL[c.animal]||'do')+' '+c.animal;
+  if(kind==='elem')return (ART_ELEM[c.elemento]||'do')+' '+c.elemento;
+  if(kind==='num')return 'do seu Caminho '+c.lp;
+  return 'do seu nome';
+}
+
+/** Maiúscula só na primeira letra, sem mexer no resto (Áries continua Áries). */
+function inicial(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/** "somada/somado" concorda com o PRIMEIRO traço; a preposição contrai com o
+    artigo do SEGUNDO: a+a=à, a+o=ao. */
+function somaEntre(primeiro,segundo){
+  const v = primeiro.indexOf('o ')===0 ? 'somado' : 'somada';
+  if(segundo.indexOf('a ')===0) return v+' à '+segundo.slice(2);
+  if(segundo.indexOf('o ')===0) return v+' ao '+segundo.slice(2);
+  return v+' a '+segundo;
+}
+
+function derivarRaiz(c,raiz,comps,seed){
+  const prioridade={signo:0,num:1,animal:2,elem:3,exp:4};
+  const achados=[];
+  raiz[3].forEach(t=>comps.forEach(cp=>{
+    if(cp.tags.indexOf(t)>=0 && SUBST[t]) achados.push({t,kind:cp.kind});
+  }));
+  achados.sort((a,b)=>prioridade[a.kind]-prioridade[b.kind]);
+  // nunca repetir a mesma origem NEM o mesmo traço
+  const origens=new Set(), traos=new Set(), escolhidos=[];
+  for(const a of achados){
+    if(origens.has(a.kind)||traos.has(a.t))continue;
+    origens.add(a.kind); traos.add(a.t); escolhidos.push(a);
+    if(escolhidos.length===2)break;
+  }
+  if(!escolhidos.length)return null;
+  const p=escolhidos.map(a=>SUBST[a.t]+' '+origemLabel(a.kind,c));
+  const frase = p.length===2 ? inicial(p[0])+' '+somaEntre(p[0],p[1]) : inicial(p[0]);
+  return frase+': é daí que vem '+(raiz[1]==='da'?'a ':'o ')+raiz[0]+'.';
+}
+
 /* ==================================================================
    GERAÇÃO DO PERFIL COMPLETO (conteúdo pago)
    ================================================================== */
@@ -234,7 +340,15 @@ export function gerarPerfil(nome, y, m, d, uf) {
   const evitaTags = tt.filter(t => EVITA[t]).slice(0, 3);
   const pares = PAR[c.signo] || [];
 
+  const raiz = escolherRaiz(w, seed);
+  const raizArquivo = 'alma-' + stripAccents(raiz[0]).toLowerCase().replace(/\s+/g,'-') + '.jpg';
+
   return {
+    almaBrasileira: {
+      nome: raiz[0], artigo: raiz[1], valor: raiz[2], texto: raiz[4],
+      imagem: raizArquivo,
+      porque: derivarRaiz(c, raiz, comps, seed)
+    },
     base: {
       nome: c.nome, primeiro: c.primeiro, signo: c.signo, animal: c.animal,
       elemento: c.elemento, lp: c.lp, idade: c.idade, y: c.y, m: c.m, d: c.d, uf: c.uf
@@ -266,6 +380,8 @@ export function gerarPerfil(nome, y, m, d, uf) {
     }
   };
 }
+
+export function nomesAlmas(){ return RAIZ.map(r=>r[0]); }
 
 export { UFS, regiao, zodiac, chineseAnimal, chineseElement, lifePath, expression, cap, stripAccents };
 

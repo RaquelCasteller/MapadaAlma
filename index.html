@@ -148,6 +148,20 @@
   .raiz .nome{font-family:"Playfair Display",serif;font-size:clamp(28px,6.4vw,42px);color:var(--navy);line-height:1.08;margin:6px 0 2px}
   .raiz .valor{font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
   .raiz .txt{font-size:18px;color:var(--ink);margin:0;text-align:left}
+  .gancho{background:#fbf6e7;border:1px dashed var(--gold);text-align:center;padding:20px 18px;margin:18px 0 4px}
+  .gancho .nomes{font-family:"Playfair Display",serif;font-size:clamp(19px,4.2vw,25px);color:var(--navy);line-height:1.35}
+  .gancho .sub{font-style:italic;color:var(--ink-soft);margin:10px 0 12px;font-size:17px}
+  .gancho .blocos{font-family:"Playfair Display",serif;font-size:clamp(22px,5vw,30px);color:var(--ink-soft);letter-spacing:.05em}
+  .alma{background:linear-gradient(180deg,#f9f0d8,#efe0be);border:2px solid var(--gold);text-align:center;padding:26px 20px 22px;margin:6px 0 4px;
+    box-shadow:0 10px 30px rgba(60,45,20,.14)}
+  .alma img{width:min(72%,300px);height:auto;display:block;margin:0 auto 14px;border-radius:50%;
+    box-shadow:0 6px 20px rgba(60,45,20,.22)}
+  .alma .lbl{font-family:"Special Elite",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--red)}
+  .alma .nome{font-family:"Playfair Display",serif;font-size:clamp(27px,6.2vw,40px);color:var(--navy);line-height:1.08;margin:6px 0 2px}
+  .alma .valor{font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+  .alma .txt{font-size:18px;color:var(--ink);margin:14px 0 0;text-align:left}
+  .alma .porque{font-size:16px;font-style:italic;color:var(--ink-soft);border-top:1px solid var(--line);margin-top:14px;padding-top:12px;text-align:left}
+  .alma .nota{font-size:13px;color:var(--ink-soft);margin-top:10px;opacity:.85}
   .barnum{background:#fbf6e7;border-left:4px solid var(--red);padding:14px 18px;margin:16px 0 4px;font-style:italic;font-size:19px}
   .barnum .tag{display:block;font-family:"Special Elite",monospace;font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
   /* ancoragem de preço */
@@ -321,11 +335,10 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
       <div class="prose"><p class="lead" id="rTeaser">—</p></div>
 
 
-      <div class="raiz" id="rRaiz">
-        <div class="lbl">A sua raiz brasileira</div>
-        <div class="nome" id="rRaizNome">—</div>
-        <div class="valor" id="rRaizValor">—</div>
-        <p class="txt" id="rRaizTxt">—</p>
+      <div class="gancho" id="rGancho" style="display:none">
+        <div class="nomes" id="rGanchoNomes">—</div>
+        <p class="sub">Uma dessas almas brasileiras vive em você — e nós já sabemos qual.</p>
+        <div class="blocos">████████</div>
       </div>
       <div class="barnum" id="rBarnum"><span class="tag">O que os seus números entregam de você</span><span id="rBarnumTxt">—</span></div>
 
@@ -374,9 +387,19 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
       <div id="unlocked" style="display:none">
         <hr class="rule double"/>
 
-        <div class="arq-reveal">
-          <div class="lbl">Entre os doze, você é</div>
-          <div class="nome" id="uArqNome">—</div>
+        <div class="alma" id="uAlma">
+          <img id="uAlmaImg" src="" alt="" loading="lazy"/>
+          <div class="lbl">A alma brasileira que vive em você</div>
+          <div class="nome" id="uAlmaNome">—</div>
+          <div class="valor" id="uAlmaValor">—</div>
+          <p class="txt" id="uAlmaTxt">—</p>
+          <p class="porque" id="uAlmaPorque">—</p>
+          <p class="nota">São figuras da história e da cultura popular brasileira — tipos do nosso povo, não entidades.</p>
+        </div>
+
+        <div class="arq-reveal" style="margin-top:22px">
+          <div class="lbl">E entre os doze arquétipos, você é</div>
+          <div class="nome" id="uArqNome" style="font-size:clamp(24px,5.4vw,34px)">—</div>
           <p class="lema" id="uArqLema">—</p>
         </div>
         <div class="selo-wrap">
@@ -462,7 +485,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
     <button class="btn ghost" id="reset">Fazer outro Mapa da Alma</button>
   </section>
 
-  <p class="foot">Mapa da Alma · uma peça de entretenimento místico e nostálgico, sem valor preditivo ou científico.<br/><a href="privacidade.html" style="color:inherit">Política de Privacidade</a> · <a href="mailto:raquel.cibien@gmail.com" style="color:inherit">raquel.cibien@gmail.com</a></p>
+  <p class="foot">Mapa da Alma · uma peça de entretenimento místico e nostálgico, sem valor preditivo ou científico.<br/><a href="privacidade.html" style="color:inherit">Política de Privacidade</a> · <a href="mailto:almanaquedalma@gmail.com" style="color:inherit">almanaquedalma@gmail.com</a></p>
 </div>
 
 <script>
@@ -524,48 +547,6 @@ const BARNUM={"poder":["Você já foi chamado de “controlador” por gente que
 
 
 
-/* ===== A SUA RAIZ BRASILEIRA (13 arquétipos) =====
-   Aparece na prévia gratuita: é o elemento que nenhum outro site tem.
-   [nome, artigo, valor, tags, texto] */
-const RAIZ = [
-  ['Malandro','do','Astúcia',['esperteza','versatilidade','carisma','sobrevivencia','estrategia'],
-   'Você acha a saída quando a porta está fechada. Não por sorte: você lê a situação antes dela acontecer, e sabe que jeitinho bem-dado é uma forma de inteligência. O risco é confiar tanto na improvisação que você deixa de construir o que dá trabalho.',0.3803],
-  ['Cangaceiro','do','Coragem',['coragem','rebeldia','lideranca','poder','justica','impeto'],
-   'Você não abaixa a cabeça para quem não merece. Quando algo te parece injusto, você age — e arrasta gente com você, mesmo sem ter pedido para liderar. A conta vem no cansaço de quem nunca se permite recuar.',0.3086],
-  ['Benzedeira','da','Cura',['cuidado','intuicao','sensibilidade','servico','generosidade'],
-   'As pessoas saem de perto de você mais leves do que chegaram, e quase nunca sabem explicar por quê. Você sente o que não foi dito e cuida antes de ser chamado. O que falta é lembrar que você também precisa de colo.',0.219],
-  ['Tropeiro','do','Adaptação',['aventura','resiliencia','versatilidade','independencia','liberdade'],
-   'Você se ajusta a qualquer terreno e não perde o rumo por causa de imprevisto. Estrada nova não te assusta: te acorda. O perigo é seguir viagem para não ter que ficar e resolver.',0.2534],
-  ['Vaqueiro','do','Perseverança',['disciplina','resiliencia','estabilidade','etica','sobrevivencia','lealdade'],
-   'Você termina o que começa mesmo depois que a vontade acabou. Não faz barulho, não pede plateia, e é em você que os outros se apoiam quando tudo balança. O preço é aguentar mais do que devia antes de pedir ajuda.',0.345],
-  ['Capoeirista','do','Equilíbrio',['harmonia','diplomacia','esperteza','crescimento','acao'],
-   'Você desarma tensão com jogo de corpo, não com força. Sabe recuar para avançar melhor, e transforma conflito em movimento. Quem não te conhece confunde a sua ginga com falta de posição.',0.5634],
-  ['Caipira Sábio','do','Simplicidade',['filosofia','tradicao','sinceridade','estabilidade','familia'],
-   'Você desconfia de conversa complicada e acerta com frases curtas. Aprendeu com quem veio antes e não tem pressa de jogar fora o que funciona. Às vezes o mundo te chama de atrasado justamente quando você está certo.',0.4053],
-  ['Artesã','da','Criatividade',['arte','precisao','inovacao','analise','sonho'],
-   'Você repara no detalhe que ninguém vê e não descansa até ele ficar no lugar. Faz com a mão o que a maioria só imagina. A armadilha é refazer para sempre uma coisa que já estava boa.',0.3878],
-  ['Pescador','do','Paciência',['analise','misterio','intuicao','precisao','estabilidade'],
-   'Você sabe esperar o tempo certo e desconfia de pressa. Observa muito antes de agir, e quando age raramente erra. Mas há coisas na sua vida que estão esperando há tempo demais.',0.3696],
-  ['Mateiro','do','Exploração',['curiosidade','aventura','visao','ambicao','coragem'],
-   'Você entra onde não tem trilha e volta sabendo o caminho. Enxerga o fim da história quando os outros ainda estão no começo, e cansa de esperar que cheguem lá. O difícil é aceitar companhia num ritmo mais lento que o seu.',0.4008],
-  ['Carnavalesco','do','Alegria e conexão',['palco','carisma','otimismo','sensualidade','inspiracao'],
-   'Você entra num lugar e o clima muda. Junta gente que não se conhecia e faz parecer fácil, quando é trabalho. Poucos percebem quanto você segura por dentro para manter a festa de pé.',0.4896],
-  ['Repentista','do','A palavra',['palavra','franqueza','inspiracao','esperteza','palco'],
-   'Você responde antes de pensar e acerta. A palavra é a sua arma e o seu abrigo, e você já mudou o rumo de alguém com uma frase que nem lembra ter dito. O outro lado é a verdade que sai na hora errada.',0.7621],
-  ['Seresteiro','do','Saudade',['sensibilidade','paixao','arte','sonho','intensidade'],
-   'Você sente as coisas inteiras, nunca pela metade, e guarda com cuidado o que já passou. Transforma falta em beleza. Mas há uma diferença entre honrar a saudade e morar dentro dela.',0.3248]
-];
-
-function escolherRaiz(w,seed){
-  // o fator (índice 5) equaliza a distribuição: sem ele, uma em cada quatro
-  // pessoas cairia na Benzedeira e o Repentista quase nunca sairia
-  const notas=RAIZ.map(r=>[r,r[3].reduce((s,t)=>s+(w[t]||0),0)*r[5]]);
-  const max=Math.max(...notas.map(n=>n[1]));
-  // empate é comum: a semente decide, sempre igual para a mesma pessoa
-  const pool=notas.filter(n=>Math.abs(n[1]-max)<1e-9).map(n=>n[0]);
-  return pool[seed%pool.length];
-}
-
 function buildTags(c){
   const comps=[{tags:SIGNO[c.signo].tags,kind:'signo'},{tags:NUM[c.lp].tags,kind:'num'},{tags:(NUM[c.exp]||{tags:[]}).tags,kind:'exp'},{tags:ANIMAL[c.animal].tags,kind:'animal'},{tags:ELEM[c.elemento],kind:'elem'}];
   const w={};comps.forEach(cp=>{const wt=cp.kind==='num'?3:cp.kind==='signo'?2:1;cp.tags.forEach(t=>{w[t]=(w[t]||0)+wt;});});
@@ -621,11 +602,7 @@ function renderPrevia(){
   $('rCaminho').textContent=c.lp;
   $('rTeaser').innerHTML=`<span class="drop">${c.primeiro[0]}</span>${c.primeiro}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
   $('rBarnumTxt').textContent=barnumFrase(c,PREVIA.tt,PREVIA.seed);
-
-  const raiz=escolherRaiz(PREVIA.w||buildTags({...c,exp:expression(c.primeiro)}),PREVIA.seed);
-  $('rRaizNome').textContent='Você tem a alma '+raiz[1]+' '+raiz[0];
-  $('rRaizValor').textContent='✦ '+raiz[2]+' ✦';
-  $('rRaizTxt').textContent=raiz[4];
+  carregarGancho(c);
 
   // Os valores reais NÃO estão no navegador. Os blocos têm tamanho variável
   // por pessoa só para parecerem o que são: um texto escondido.
@@ -646,6 +623,23 @@ function renderPrevia(){
   $('lockedZone').style.display='block';
   $('unlocked').style.display='none';
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+
+/* ---------- gancho da alma brasileira (só nomes, nunca o resultado) ---------- */
+async function carregarGancho(c){
+  const box=$('rGancho');
+  if(PERFIL){box.style.display='none';return;}   // já pagou: nada de gancho
+  try{
+    const r=await fetch('/.netlify/functions/gancho?nome='+encodeURIComponent(c.nome)+
+      '&ano='+c.y+'&mes='+c.m+'&dia='+c.d);
+    if(!r.ok)return;
+    const d=await r.json();
+    if(!d.nomes||!d.nomes.length)return;
+    if(PERFIL){box.style.display='none';return;}  // destravou enquanto buscava
+    $('rGanchoNomes').textContent=d.nomes.join('? ')+'?';
+    box.style.display='block';
+  }catch(e){/* sem gancho é melhor que gancho quebrado */}
 }
 
 /* ---------- pagamento ---------- */
@@ -759,6 +753,21 @@ function abrirConteudo(perfil,cupom){
   renderPrevia();
   $('lockedZone').style.display='none';
   $('unlocked').style.display='block';
+  $('rGancho').style.display='none';
+
+  const a=perfil.almaBrasileira;
+  if(a){
+    $('uAlmaNome').textContent='É '+(a.artigo==='da'?'a ':'o ')+a.nome+' que vive em você';
+    $('uAlmaValor').textContent='✦ '+a.valor+' ✦';
+    $('uAlmaTxt').textContent=a.texto;
+    $('uAlmaPorque').textContent=a.porque||'';
+    if(a.porque===''||!a.porque)$('uAlmaPorque').style.display='none';
+    const img=$('uAlmaImg');
+    img.alt='Ilustração: '+a.nome;
+    img.onerror=function(){this.style.display='none';};
+    img.src='img/'+a.imagem;
+    $('uAlma').style.display='block';
+  }else{$('uAlma').style.display='none';}
 
   $('uArqNome').textContent=perfil.arquetipo.nome;
   $('uArqLema').textContent='“'+perfil.arquetipo.lema+'”';
@@ -926,7 +935,11 @@ function wrapText(ctx,text,maxW){
   if(cur)lines.push(cur);return lines;
 }
 async function buildShareCard(){
-  const c=CURRENT;const D={arqNome:PERFIL.arquetipo.nome,arq:[0,0,PERFIL.arquetipo.lema]};if(!c||!PERFIL)return;
+  const c=CURRENT;if(!c||!PERFIL)return;
+  const alma=PERFIL.almaBrasileira;
+  const D=alma
+    ? {arqNome:(alma.artigo==='da'?'A ':'O ')+alma.nome,arq:[0,0,alma.valor]}
+    : {arqNome:PERFIL.arquetipo.nome,arq:[0,0,PERFIL.arquetipo.lema]};
   const cv=$('shareCanvas'),ctx=cv.getContext('2d');
   const W=cv.width,H=cv.height;
   try{await document.fonts.ready;}catch(e){}
@@ -965,7 +978,7 @@ async function buildShareCard(){
   let arqSize=84,arqLines,lemaLines,total;
   for(;;){
     ctx.font='800 '+arqSize+'px '+SERIF;arqLines=wrapText(ctx,D.arqNome,W-230);
-    ctx.font='italic 38px '+BODY;lemaLines=wrapText(ctx,'“'+D.arq[2]+'”',W-250);
+    ctx.font='italic 38px '+BODY;lemaLines=wrapText(ctx,alma?'✦ '+D.arq[2]+' ✦':'“'+D.arq[2]+'”',W-250);
     total=40+gapName+24+gapLabel
       +arqLines.length*arqSize+(arqLines.length-1)*gapArq+gapAfterArq
       +lemaLines.length*38+(lemaLines.length-1)*gapLema+gapAfterLema
@@ -977,7 +990,7 @@ async function buildShareCard(){
   ctx.fillStyle='#5b4f42';ctx.font='italic 40px '+BODY;
   y+=40;ctx.fillText(c.primeiro,W/2,y);y+=gapName;
   ctx.fillStyle='#8f2d2d';ctx.font='500 24px "Special Elite", monospace';
-  y+=24;ctx.fillText('E N T R E   O S   D O Z E ,   V O C Ê   É',W/2,y);y+=gapLabel;
+  y+=24;ctx.fillText(alma?'A   A L M A   Q U E   V I V E   E M   V O C Ê':'E N T R E   O S   D O Z E ,   V O C Ê   É',W/2,y);y+=gapLabel;
   ctx.fillStyle='#23395b';ctx.font='800 '+arqSize+'px '+SERIF;
   arqLines.forEach((l,i)=>{y+=arqSize;ctx.fillText(l,W/2,y);if(i<arqLines.length-1)y+=gapArq;});
   y+=gapAfterArq;
@@ -996,7 +1009,7 @@ $('shareBtn').addEventListener('click',async()=>{
   const blob=await shareBlob();if(!blob)return;
   const file=new File([blob],'meu-mapa-da-alma.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],title:'Meu Mapa da Alma',text:`Descobri que eu sou ${PERFIL.arquetipo.nome}. Faça o seu em ${CONFIG.SITE_URL}`});return;}catch(e){}
+    try{await navigator.share({files:[file],title:'Meu Mapa da Alma',text:`${PERFIL.almaBrasileira?('Descobri qual alma brasileira vive em mim: '+PERFIL.almaBrasileira.nome):('Descobri que eu sou '+PERFIL.arquetipo.nome)}. Faça o seu em ${CONFIG.SITE_URL}`});return;}catch(e){}
   }
   baixarCard();
   $('shareHint').textContent='Seu aparelho não abre o compartilhamento direto — a imagem foi baixada. É só postar.';
@@ -1043,11 +1056,23 @@ function gerarPDF(){
 
   // miolo
   doc.addPage();bg();y=80;
-  head('Entre os doze, você é');
-  doc.setFont('times','bold');doc.setFontSize(30);doc.setTextColor(...navy);
-  doc.splitTextToSize(P.arquetipo.nome,W-2*M).forEach(l=>{doc.text(l,W/2,y+14,{align:'center'});y+=34;});
-  doc.setFont('times','italic');doc.setFontSize(14);doc.setTextColor(...ink);
-  doc.text('“'+P.arquetipo.lema+'”',W/2,y+16,{align:'center'});y+=48;
+  if(P.almaBrasileira){
+    const A=P.almaBrasileira;
+    head('A alma brasileira que vive em você');
+    doc.setFont('times','bold');doc.setFontSize(30);doc.setTextColor(...navy);
+    doc.splitTextToSize((A.artigo==='da'?'A ':'O ')+A.nome,W-2*M).forEach(l=>{doc.text(l,W/2,y+14,{align:'center'});y+=34;});
+    doc.setFont('times','italic');doc.setFontSize(13);doc.setTextColor(...red);
+    doc.text('✦ '+A.valor+' ✦',W/2,y+14,{align:'center'});y+=34;
+    para(A.texto,12,ink);
+    if(A.porque){y+=4;para(A.porque,11,ink,'italic');}
+    y+=6;para('São figuras da história e da cultura popular brasileira — tipos do nosso povo, não entidades.',10,ink,'italic');
+    y+=10;
+  }
+  head('E entre os doze arquétipos, você é');
+  doc.setFont('times','bold');doc.setFontSize(24);doc.setTextColor(...navy);
+  doc.splitTextToSize(P.arquetipo.nome,W-2*M).forEach(l=>{doc.text(l,W/2,y+14,{align:'center'});y+=30;});
+  doc.setFont('times','italic');doc.setFontSize(13);doc.setTextColor(...ink);
+  doc.text('“'+P.arquetipo.lema+'”',W/2,y+16,{align:'center'});y+=44;
 
   head('Quem você é');
   para(P.perfil[0],13,ink);y+=4;
