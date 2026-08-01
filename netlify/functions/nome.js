@@ -40,6 +40,9 @@ function montarFrase(nome, res) {
   }
 
   const total = res.reduce((a, r) => a + (r.frequencia || 0), 0);
+  // O Censo conta cada GRAFIA separadamente: Susana e Suzana, Luis e Luiz,
+  // Ana e Anna são nomes distintos na base. Por isso a frase diz "escrito
+  // exatamente assim" — sem isso o número parece baixo e a pessoa desconfia.
   const pico = res.reduce((a, r) => (r.frequencia > a.frequencia ? r : a), res[0]);
   const decada = DECADAS[pico.periodo] || pico.periodo;
   const ultima = res[res.length - 1];
@@ -52,8 +55,8 @@ function montarFrase(nome, res) {
     tendencia = ' e continua em alta';
   }
 
-  return `Existem cerca de <b>${milhar(total)}</b> pessoas chamadas <b>${bonito}</b> no Brasil. ` +
-         `O nome teve o auge nos <b>${decada}</b>${tendencia}.`;
+  return `Existem cerca de <b>${milhar(total)}</b> pessoas chamadas <b>${bonito}</b> no Brasil — ` +
+         `escrito exatamente assim. O nome teve o auge nos <b>${decada}</b>${tendencia}.`;
 }
 
 exports.handler = async (event) => {
