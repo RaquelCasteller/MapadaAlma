@@ -161,8 +161,25 @@
   .alma .valor{font-family:"Special Elite",monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
   .alma .txt{font-size:18px;color:var(--ink);margin:14px 0 0;text-align:left}
   .alma .porque{font-size:16px;font-style:italic;color:var(--ink-soft);border-top:1px solid var(--line);margin-top:14px;padding-top:12px;text-align:left}
+  /* derivação fora do bloco da alma: mesma voz, sem a barra de cima */
+  #uArqPorque,#uDuplaPorque{font-size:16px;font-style:italic;color:var(--ink-soft);margin:8px 0 0;text-align:center}
   .alma .nota{font-size:13px;color:var(--ink-soft);margin-top:10px;opacity:.85}
   .barnum{background:#fbf6e7;border-left:4px solid var(--red);padding:14px 18px;margin:16px 0 4px;font-style:italic;font-size:19px}
+  .atrito{background:linear-gradient(180deg,#fbf6e7 0%,#f3e8cd 100%);border:1px solid var(--gold);border-left:4px solid var(--red);padding:18px 20px 14px;margin:16px 0 4px}
+  .atrito .tag{display:block;font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+  .atrito p{margin:0;font-size:20px;line-height:1.45}
+  .atrito .corte{margin-top:14px;padding-top:12px;border-top:1px dashed var(--gold);text-align:center}
+  .atrito .corte span{font-style:italic;color:var(--ink-soft);font-size:17px}
+  .atrito .corte .blocos{font-family:monospace;letter-spacing:-1px;color:var(--line);margin-top:8px;font-size:15px}
+  .fatos{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:18px 0 4px}
+  .fatos .cab{font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);text-align:center;margin-bottom:10px}
+  .fatos .linhas{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 18px}
+  .fatos .f{display:flex;gap:9px;align-items:baseline;font-size:17px;line-height:1.35}
+  .fatos .f .ic{flex:0 0 auto;font-size:15px;opacity:.75}
+  .fatos .f b{font-family:"Playfair Display",serif;font-weight:600}
+  .fatos .ibge{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:17px;text-align:center;min-height:0}
+  .fatos .ibge .fonte{font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-top:5px}
+  @media (max-width:560px){.fatos .linhas{grid-template-columns:1fr}}
   .barnum .tag{display:block;font-family:"Special Elite",monospace;font-style:normal;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
   /* ancoragem de preço */
   .anchor-stack{margin:0 auto 10px;max-width:420px}
@@ -332,6 +349,13 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
         <div class="stat"><div class="big" id="rChines">—</div><div class="lbl">Zodíaco Chinês</div></div>
         <div class="stat"><div class="big" id="rCaminho">—</div><div class="lbl">Caminho de Vida</div></div>
       </div>
+      <!-- FATOS: prova de que o cálculo é real. Vem ANTES da interpretação, como lastro. -->
+      <div class="fatos" id="rFatos">
+        <div class="cab">O que os registros dizem de você</div>
+        <div class="linhas" id="rFatosLinhas"></div>
+        <div class="ibge" id="rIbge" style="display:none"></div>
+      </div>
+
       <div class="prose"><p class="lead" id="rTeaser">—</p></div>
 
 
@@ -342,15 +366,27 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
       </div>
       <div class="barnum" id="rBarnum"><span class="tag">O que os seus números entregam de você</span><span id="rBarnumTxt">—</span></div>
 
+      <!-- ATRITO: interpretação que ABRE. Nomeia a contradição e para.
+           A resolução dela é o arquétipo — que é pago. -->
+      <div class="atrito" id="rAtrito" style="display:none">
+        <div class="tag">A contradição que mora em você</div>
+        <p id="rAtritoTxt">—</p>
+        <div class="corte">
+          <span>E é desse atrito que nasce o seu <b>arquétipo</b> — um entre doze.</span>
+          <div class="blocos">███████████████</div>
+        </div>
+      </div>
+
       <!-- CURIOSITY GAP -->
       <div class="locked" id="lockedZone">
-        <div class="locked-h" id="lockedH">Seu arquétipo já foi calculado. Ele está logo ali.</div>
-        <div class="locked-sub">De todos os doze, os seus astros apontaram exatamente um — e ele explica coisas que você nunca soube nomear.</div>
+        <div class="locked-h" id="lockedH">Duas peças suas já foram calculadas.</div>
+        <div class="locked-sub">O <b>arquétipo</b> diz como você funciona — um entre doze. A <b>alma brasileira</b> diz de que Brasil você veio — e essa lista a gente não conta. São coisas diferentes, e você tem as duas.</div>
         <div class="reveal-grid" id="revealGrid"></div>
 
         <div class="gate">
           <div class="flag">Oferta de lançamento</div>
           <div class="stack">
+            <div><span class="ck">✓</span> <strong>Sua alma brasileira</strong> — qual figura do nosso povo vive em você</div>
             <div><span class="ck">✓</span> <strong>Seu arquétipo</strong> — qual dos doze você é, e o lema que rege a sua vida</div>
             <div><span class="ck">✓</span> O personagem da ficção brasileira que é a sua cara</div>
             <div><span class="ck">✓</span> O filme, o livro, a série, a novela e a música da sua vida</div>
@@ -401,6 +437,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
           <div class="lbl">E entre os doze arquétipos, você é</div>
           <div class="nome" id="uArqNome" style="font-size:clamp(24px,5.4vw,34px)">—</div>
           <p class="lema" id="uArqLema">—</p>
+          <p class="porque" id="uArqPorque">—</p>
         </div>
         <div class="selo-wrap">
           <img class="selo lg" src="img/selo.png" alt="Selo do Mapa da Alma"/>
@@ -426,7 +463,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
           <img class="tarot-art" loading="lazy" decoding="async" src="img/carta-tarot.jpg" alt="Ilustração de carta do Tarô"/>
           <div class="tarot"><div class="card-ico">🂠</div><div><b id="tarotName" style="font-family:'Playfair Display',serif;font-size:22px"></b><div class="why" id="tarotWhy"></div></div></div></div>
         <div class="sec"><h3>✦ A época em que você teria brilhado</h3><div class="prose" id="epoca"></div></div>
-        <div class="sec"><h3>✦ Seu superpoder & sua kryptonita</h3><div class="twocol">
+        <div class="sec"><h3>✦ Seu superpoder & sua kryptonita</h3><p class="porque" id="uDuplaPorque" style="margin-top:-6px">—</p><div class="twocol">
           <div class="listbox"><div class="eyebrow">Superpoder</div><p id="superP" style="margin:6px 0 0"></p></div>
           <div class="listbox"><div class="eyebrow">Kryptonita</div><p id="krypP" style="margin:6px 0 0"></p></div></div></div>
         <div class="sec"><h3>✦ Seu par ideal</h3><div class="prose" id="par"></div></div>
@@ -520,7 +557,7 @@ function fbTrackUmaVez(chave,evento,dados){
 /* ---------- utilidades ---------- */
 function stripAccents(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ç/gi,'c');}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
-function blocos(n){return '█'.repeat(n);}
+function blocos(n){n=Number(n);if(!Number.isFinite(n))n=8;return '█'.repeat(Math.min(40,Math.max(4,Math.floor(n))));}
 
 const ZODIAC=[['Capricórnio',1,1,1,19],['Aquário',1,20,2,18],['Peixes',2,19,3,20],['Áries',3,21,4,19],['Touro',4,20,5,20],['Gêmeos',5,21,6,20],['Câncer',6,21,7,22],['Leão',7,23,8,22],['Virgem',8,23,9,22],['Libra',9,23,10,22],['Escorpião',10,23,11,21],['Sagitário',11,22,12,21],['Capricórnio',12,22,12,31]];
 function zodiac(m,d){for(const[n,m1,d1,m2,d2]of ZODIAC){if((m===m1&&d>=d1)||(m===m2&&d<=d2))return n;}return'—';}
@@ -533,7 +570,11 @@ function reduce(n){while(n>9&&n!==11&&n!==22&&n!==33){n=String(n).split('').redu
 function lifePath(y,m,d){return reduce(reduce(m)+reduce(d)+reduce(String(y).split('').reduce((a,b)=>a+ +b,0)));}
 const PYTH={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
 function expression(nm){const c=stripAccents(nm).toUpperCase().replace(/[^A-Z]/g,'');let s=0;for(const ch of c)s+=PYTH[ch]||0;return reduce(s);}
-function seedNum(c){let h=2166136261>>>0;const s=(c.nome+'|'+c.y+'|'+c.m+'|'+c.d).toLowerCase();for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* A semente precisa ser IMUNE a variação de digitação: acento, caixa e espaço
+   duplo não podem mudar o filme da vida de ninguém. Sem isso, "José" e "Jose"
+   eram duas pessoas diferentes para o sorteio. */
+function chaveSemente(c){return stripAccents(String(c.nome)).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()+'|'+c.y+'|'+c.m+'|'+c.d;}
+function seedNum(c){let h=2166136261>>>0;const s=chaveSemente(c);for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
 
 /* Dados da PRÉVIA — gerados automaticamente, não editar à mão.
    Contém apenas o que a prévia gratuita mostra. O conteúdo pago
@@ -548,8 +589,11 @@ const BARNUM={"poder":["Você já foi chamado de “controlador” por gente que
 
 
 function buildTags(c){
-  const comps=[{tags:SIGNO[c.signo].tags,kind:'signo'},{tags:NUM[c.lp].tags,kind:'num'},{tags:(NUM[c.exp]||{tags:[]}).tags,kind:'exp'},{tags:ANIMAL[c.animal].tags,kind:'animal'},{tags:ELEM[c.elemento],kind:'elem'}];
-  const w={};comps.forEach(cp=>{const wt=cp.kind==='num'?3:cp.kind==='signo'?2:1;cp.tags.forEach(t=>{w[t]=(w[t]||0)+wt;});});
+  const comps=[{tags:SIGNO[c.signo].tags,kind:'signo'},{tags:NUM[c.lp].tags,kind:'num'},{tags:(NUM[c.exp]||{tags:[]}).tags,kind:'exp'},{tags:(NUM[c.alma]||{tags:[]}).tags,kind:'alma'},{tags:(NUM[c.persona]||{tags:[]}).tags,kind:'persona'},{tags:ANIMAL[c.animal].tags,kind:'animal'},{tags:ELEM[c.elemento],kind:'elem'}];
+  /* PESOS — tem que ser IDÊNTICO ao de motor.js, senão a prévia e o conteúdo pago
+     discordam sobre a mesma pessoa. Mexeu aqui? Mexa lá, e recalibre os fatores. */
+  const PESO={num:3,signo:2,alma:2,exp:1,persona:1,animal:1,elem:1};
+  const w={};comps.forEach(cp=>{const wt=PESO[cp.kind]||1;cp.tags.forEach(t=>{w[t]=(w[t]||0)+wt;});});
   return w;
 }
 function topTags(w,n){return Object.keys(w).sort((a,b)=>w[b]-w[a]).slice(0,n);}
@@ -574,10 +618,150 @@ else{$('urgencyBar').textContent=CONFIG.LAUNCH_TEXT;}
 
 let CURRENT=null, PREVIA=null, PERFIL=null, TOKEN=null, POLL=null;
 
+/* ===== O ATRITO =====
+   Interpretação que ABRE. Cada linha nomeia uma contradição interna real e para ali.
+   Nada aqui revela arquétipo, personagem, kryptonita ou missão — a resolução é paga.
+   Escolhe o par cujo membro MAIS FRACO ainda pesa muito: só aí a tensão é de verdade. */
+const ATRITOS=[
+  ['liberdade','familia','Você precisa de espaço para respirar e ao mesmo tempo não larga a mão dos seus. Toda decisão grande da sua vida passou por esse cabo de guerra — e você nunca contou isso pra ninguém direito.'],
+  ['liberdade','disciplina','Você detesta ser mandado e é o mais duro dos seus próprios chefes. As correntes que mais te apertaram foram as que você mesmo colocou.'],
+  ['acao','analise','Metade de você já resolveu. A outra metade ainda está pesando. Quando as duas discordam, você faz e depois passa dias revisitando.'],
+  ['impeto','estrategia','Você enxerga a jogada inteira e mesmo assim se joga antes da hora. Não é falta de plano — é pressa de chegar.'],
+  ['misterio','palavra','Você fala bem e conta pouco. As pessoas saem das conversas achando que te conhecem, e você sabe que não.'],
+  ['rebeldia','tradicao','Você desconfia de tudo que é "sempre foi assim" e guarda com carinho coisas que só têm valor porque vieram de antes.'],
+  ['independencia','cuidado','Você sustenta todo mundo e trava na hora de pedir. Já ficou sem para alguém não ficar — e não avisou.'],
+  ['ambicao','servico','Você quer chegar longe e não consegue passar por cima de ninguém no caminho. Isso já te custou oportunidade, e você faria de novo.'],
+  ['aventura','estabilidade','Você precisa de chão firme para poder arriscar. Quem te olha de fora chama de medo; é exatamente o contrário.'],
+  ['sinceridade','harmonia','Você não sabe fingir que gostou e não suporta clima ruim. Vive escolhendo qual das duas dores vai engolir hoje.'],
+  ['franqueza','diplomacia','Você lê a sala inteira antes de falar — e às vezes fala assim mesmo. Sua verdade já chegou na hora errada mais de uma vez.'],
+  ['palco','misterio','Você quer ser visto e não quer ser lido. Chama atenção com facilidade e depois se recolhe quando alguém chega perto demais.'],
+  ['sonho','precisao','Você tem uma vida inteira acontecendo na cabeça e um detalhe torto te tira do sério. Idealista no plano, implacável na execução.'],
+  ['intensidade','harmonia','Você sente tudo em dobro e passa a vida abaixando o volume para não assustar os outros.'],
+  ['poder','generosidade','Você quer o controle e divide o que tem antes de pensar em si. Manda e serve ao mesmo tempo, e cansa das duas coisas.'],
+  ['crescimento','tradicao','Você não consegue ser a mesma pessoa dois anos seguidos e respeita profundamente o que veio antes de você.'],
+  ['otimismo','analise','Você acha saída onde já desistiram e enxerga todos os riscos. Já foi chamado de ingênuo por quem não viu a conta que você fez.'],
+  ['paixao','disciplina','Você não se envolve pela metade e termina o que começou mesmo sem vontade. Nunca soube qual das duas é a verdadeira.'],
+  ['rebeldia','lealdade','Você quebra regra sem pestanejar e não trai ninguém nunca. Sua fidelidade é a pessoas, jamais a instituições.'],
+  ['curiosidade','disciplina','Você começa muito mais do que termina, e o que termina fica impecável. O problema nunca foi preguiça — foi apetite.'],
+  ['coragem','sensibilidade','Você encara o que a maioria evita e leva pro pessoal o que nem era com você. Duro por fora por necessidade, não por natureza.'],
+  ['visao','estabilidade','Você enxerga dez anos à frente e precisa que o chão de hoje esteja firme. Vive puxado pelo futuro e ancorado no presente.'],
+  ['justica','diplomacia','Você não deixa passar uma injustiça e desarma tempestade só pela presença. Escolher entre brigar e apaziguar te consome.'],
+  ['lideranca','independencia','Assumem que você conduz, e no fundo você só queria que ninguém dependesse de você. Lidera por falta de opção, não por vontade.']
+];
+
+function acharAtrito(w){
+  let melhor=null,score=0;
+  for(const [a,b,frase] of ATRITOS){
+    const pa=w[a]||0,pb=w[b]||0;
+    if(!pa||!pb)continue;
+    const s=Math.min(pa,pb);          // a tensão só existe se as DUAS forças forem fortes
+    if(s>score){score=s;melhor=frase;}
+  }
+  return melhor;
+}
+
+function renderAtrito(w){
+  const frase=acharAtrito(w);
+  if(!frase){
+    const t=topTags(w,2);
+    if(t.length<2){$('rAtrito').style.display='none';return;}
+    $('rAtritoTxt').textContent='As suas duas forças mais altas puxam para o mesmo lado. '+
+      'Isso te dá uma clareza que pouca gente tem — e te deixa sem plano B quando essa direção falha.';
+  }else{
+    $('rAtritoTxt').textContent=frase;
+  }
+  $('rAtrito').style.display='block';
+}
+
+/* ===== FATOS VERIFICÁVEIS =====
+   Regra: aqui só entra o que é FATO calculado sobre a pessoa — nunca interpretação.
+   Fato é de graça (dá credibilidade e é compartilhável). Interpretação fica no pago. */
+const DIAS_SEM=[['num','domingo'],['numa','segunda-feira'],['numa','terça-feira'],['numa','quarta-feira'],['numa','quinta-feira'],['numa','sexta-feira'],['num','sábado']];
+const VOGAIS='AEIOU';
+
+function diaDaSemana(y,m,d){const [art,nome]=DIAS_SEM[new Date(y,m-1,d).getDay()];return art+' <b>'+nome+'</b>';}
+
+/* Lua nova de referência: 06/01/2000 18:14 UTC. Mês sinódico: 29,530588853 dias. */
+function faseDaLua(y,m,d){
+  const syn=29.530588853;
+  const dias=(Date.UTC(y,m-1,d,12)-Date.UTC(2000,0,6,18,14))/86400000;
+  const p=((dias%syn)+syn)%syn;
+  if(p<1.85)return'Lua Nova';
+  if(p<5.54)return'Crescente Côncava';
+  if(p<9.23)return'Quarto Crescente';
+  if(p<12.91)return'Crescente Gibosa';
+  if(p<16.61)return'Lua Cheia';
+  if(p<20.30)return'Minguante Gibosa';
+  if(p<23.99)return'Quarto Minguante';
+  if(p<27.68)return'Minguante Côncava';
+  return'Lua Nova';
+}
+
+function diasVividos(y,m,d){
+  const n=new Date();
+  return Math.max(0,Math.floor((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())-Date.UTC(y,m-1,d))/86400000));
+}
+function proximoMarco(y,m,d){
+  const alvo=(Math.floor(diasVividos(y,m,d)/1000)+1)*1000;
+  const dt=new Date(Date.UTC(y,m-1,d)+alvo*86400000);
+  return {alvo,texto:dt.getUTCDate()+' de '+MESES[dt.getUTCMonth()].toLowerCase()+' de '+dt.getUTCFullYear()};
+}
+
+/* Alma = só as vogais (o que a pessoa quer). Personalidade = só as consoantes (o que os outros veem).
+   Usam o nome COMPLETO, ao contrário de expression(), que usa só o primeiro nome.
+   Nenhum dos dois alimenta buildTags — então a calibragem dos 13 arquétipos não muda. */
+function somaLetras(nm,filtro){
+  const c=stripAccents(nm).toUpperCase().replace(/[^A-Z]/g,'');
+  let s=0;for(const ch of c)if(filtro(ch))s+=PYTH[ch]||0;return reduce(s);
+}
+const numeroAlma=nm=>somaLetras(nm,ch=>VOGAIS.includes(ch));
+const numeroPersona=nm=>somaLetras(nm,ch=>!VOGAIS.includes(ch));
+
+function milhar(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
+
+function renderFatos(c){
+  const marco=proximoMarco(c.y,c.m,c.d);
+  const linhas=[
+    ['🗓️','Você nasceu '+diaDaSemana(c.y,c.m,c.d)],
+    ['🌙','A lua estava <b>'+faseDaLua(c.y,c.m,c.d)+'</b>'],
+    ['⏳','Você já viveu <b>'+milhar(diasVividos(c.y,c.m,c.d))+' dias</b>'],
+    ['✦','Seu dia <b>'+milhar(marco.alvo)+'</b> cai em '+marco.texto],
+    ['♡','Número da Alma: <b>'+numeroAlma(c.nome)+'</b> — o que você quer'],
+    ['◇','Número da Personalidade: <b>'+numeroPersona(c.nome)+'</b> — o que os outros veem']
+  ];
+  $('rFatosLinhas').innerHTML=linhas.map(([i,t])=>`<div class="f"><span class="ic">${i}</span><span>${t}</span></div>`).join('');
+  $('rIbge').style.display='none';
+  carregarIbge(c);
+}
+
+/* Frequência do primeiro nome no Censo 2010 (IBGE). Servidor faz a chamada e o cache.
+   Se falhar, o bloco simplesmente não aparece — nunca derruba a prévia. */
+async function carregarIbge(c){
+  try{
+    const r=await fetch('/.netlify/functions/nome?nome='+encodeURIComponent(c.primeiro));
+    if(!r.ok)return;
+    const d=await r.json();
+    if(!d||!d.frase)return;
+    $('rIbge').innerHTML=d.frase+'<span class="fonte">Fonte: IBGE · Censo Demográfico 2010</span>';
+    $('rIbge').style.display='block';
+  }catch(e){/* sem IBGE é melhor que IBGE quebrado */}
+}
+
 /* ---------- prévia gratuita ---------- */
 function err(t){$('erro').textContent=t;}
 
+/* O botão nunca pode falhar em silêncio: se algo quebrar, a pessoa precisa ver
+   uma mensagem e o erro precisa aparecer no Gerenciador de Eventos da Meta. */
 function gerar(){
+  try{ gerarPrevia(); }
+  catch(e){
+    console.error('[mapa] falha ao gerar a prévia:',e);
+    err('Algo travou ao montar o seu mapa. Recarregue a página e tente de novo — se continuar, fale com a gente.');
+    try{ if(window.fbq) fbq('trackCustom','ErroPrevia',{msg:String(e&&e.message||e).slice(0,100)}); }catch(_){}
+  }
+}
+
+function gerarPrevia(){
   err('');
   const nome=$('nome').value.trim();
   const d=Number($('dia').value),m=Number($('mes').value),y=Number($('ano').value);
@@ -587,7 +771,7 @@ function gerar(){
   if(teste.getDate()!==d||teste.getMonth()!==m-1)return err('Essa data não existe no calendário. Confira o dia.');
   if(y<1940||y>2012)return err('Aceitamos nascimentos entre 1940 e 2012.');
   const primeiro=nome.split(/\s+/)[0];
-  CURRENT={nome,primeiro,y,m,d,signo:zodiac(m,d),animal:chineseAnimal(y,m,d),elemento:chineseElement(y,m,d),lp:lifePath(y,m,d),exp:expression(primeiro)};
+  CURRENT={nome,primeiro,y,m,d,signo:zodiac(m,d),animal:chineseAnimal(y,m,d),elemento:chineseElement(y,m,d),lp:lifePath(y,m,d),exp:expression(primeiro),alma:numeroAlma(nome),persona:numeroPersona(nome)};
   const w=buildTags(CURRENT);
   PREVIA={tt:topTags(w,3),seed:seedNum(CURRENT),w};
   renderPrevia();
@@ -602,6 +786,8 @@ function renderPrevia(){
   $('rCaminho').textContent=c.lp;
   $('rTeaser').innerHTML=`<span class="drop">${c.primeiro[0]}</span>${c.primeiro}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
   $('rBarnumTxt').textContent=barnumFrase(c,PREVIA.tt,PREVIA.seed);
+  renderFatos(c);
+  if(PERFIL){$('rAtrito').style.display='none';}else{renderAtrito(PREVIA.w);}
   carregarGancho(c);
 
   // Os valores reais NÃO estão no navegador. Os blocos têm tamanho variável
@@ -609,11 +795,11 @@ function renderPrevia(){
   const s=PREVIA.seed;
   const rev=[
     ['★ Seu arquétipo — quem você é entre os doze',9+(s%9)],
-    ['O lema que rege a sua vida',18+(s>>3)%12],
-    ['O personagem que você seria',6+(s>>5)%8],
-    ['Seu superpoder secreto',14+(s>>7)%12],
-    ['A profissão em que você brilha',8+(s>>9)%10],
-    ['A época em que devia ter nascido',12+(s>>11)%10]
+    ['O lema que rege a sua vida',18+(s>>>3)%12],
+    ['O personagem que você seria',6+(s>>>5)%8],
+    ['Seu superpoder secreto',14+(s>>>7)%12],
+    ['A profissão em que você brilha',8+(s>>>9)%10],
+    ['A época em que devia ter nascido',12+(s>>>11)%10]
   ];
   $('revealGrid').innerHTML=rev.map(([l,n])=>`<div class="reveal"><span class="lock">🔒</span><div class="lbl">${l}</div><div class="val">${blocos(n)}</div></div>`).join('');
 
@@ -747,7 +933,7 @@ function abrirConteudo(perfil,cupom){
   PERFIL=perfil;
   const b=perfil.base;
   CURRENT={nome:b.nome,primeiro:b.primeiro,y:b.y,m:b.m,d:b.d,signo:b.signo,animal:b.animal,elemento:b.elemento,lp:b.lp};
-  const w=buildTags({...CURRENT,exp:expression(b.primeiro)});
+  const w=buildTags({...CURRENT,exp:expression(b.primeiro),alma:numeroAlma(b.nome),persona:numeroPersona(b.nome)});
   PREVIA={tt:topTags(w,3),seed:seedNum(CURRENT),w};
 
   renderPrevia();
@@ -771,6 +957,8 @@ function abrirConteudo(perfil,cupom){
 
   $('uArqNome').textContent=perfil.arquetipo.nome;
   $('uArqLema').textContent='“'+perfil.arquetipo.lema+'”';
+  if(perfil.arquetipo.porque){$('uArqPorque').textContent=perfil.arquetipo.porque;$('uArqPorque').style.display='';}
+  else $('uArqPorque').style.display='none';
 
   $('fullProfile').innerHTML =
     `<p class="lead">${perfil.perfil[0]}</p>`+
@@ -790,6 +978,8 @@ function abrirConteudo(perfil,cupom){
   $('epoca').innerHTML=`<p>Você teria brilhado em <strong>${perfil.epoca.nome}</strong>. ${perfil.epoca.texto}</p>`;
   $('superP').textContent=perfil.superpoder;
   $('krypP').textContent=perfil.kryptonita;
+  if(perfil.duplaPorque){$('uDuplaPorque').textContent=perfil.duplaPorque;$('uDuplaPorque').style.display='';}
+  else $('uDuplaPorque').style.display='none';
 
   if(perfil.par){
     $('par').innerHTML=`<p>No amor e nas parcerias, sua melhor sintonia é com <strong>${perfil.par.melhores[0]}</strong> e <strong>${perfil.par.melhores[1]}</strong> — quem acompanha o seu ritmo sem te apagar. Já com <strong>${perfil.par.desafio}</strong> mora o desafio delicioso: atração e atrito na mesma dose.</p>`;
@@ -1103,6 +1293,7 @@ function gerarPDF(){
   para('Você teria brilhado em '+P.epoca.nome+'. '+P.epoca.texto,12,ink);
 
   head('Superpoder & kryptonita');
+  if(P.duplaPorque)para(P.duplaPorque,11,ink,'italic');
   label('Superpoder');para(P.superpoder+'.',12,ink);y+=2;
   label('Kryptonita');para(P.kryptonita+'.',12,ink);
 
