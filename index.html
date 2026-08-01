@@ -163,6 +163,14 @@
   .alma .porque{font-size:16px;font-style:italic;color:var(--ink-soft);border-top:1px solid var(--line);margin-top:14px;padding-top:12px;text-align:left}
   /* derivação fora do bloco da alma: mesma voz, sem a barra de cima */
   #uArqPorque,#uDuplaPorque{font-size:16px;font-style:italic;color:var(--ink-soft);margin:8px 0 0;text-align:center}
+  /* O PREÇO — o bloco mais forte da prévia. Fala do que já aconteceu, nunca do futuro. */
+  .preco-bloco{background:var(--navy);color:#f4ecd8;padding:24px 22px 20px;margin:18px 0 4px;border:1px solid var(--navy)}
+  .preco-bloco .cab{font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#c9a94f;text-align:center;margin-bottom:14px}
+  .preco-bloco .frase{font-size:21px;line-height:1.5;margin:0}
+  .preco-bloco .corte{margin-top:16px;padding-top:14px;border-top:1px solid rgba(201,169,79,.35)}
+  .preco-bloco .corte .lbl{font-family:"Special Elite",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#c9a94f;display:block;margin-bottom:6px}
+  .preco-bloco .corte .oculto{font-family:monospace;letter-spacing:-1px;color:rgba(244,236,216,.28);font-size:19px;display:block}
+  .preco-bloco .fecho{margin:14px 0 0;font-style:italic;font-size:17px;color:rgba(244,236,216,.8)}
   .alma .nota{font-size:13px;color:var(--ink-soft);margin-top:10px;opacity:.85}
   .barnum{background:#fbf6e7;border-left:4px solid var(--red);padding:14px 18px;margin:16px 0 4px;font-style:italic;font-size:19px}
   .atrito{background:linear-gradient(180deg,#fbf6e7 0%,#f3e8cd 100%);border:1px solid var(--gold);border-left:4px solid var(--red);padding:18px 20px 14px;margin:16px 0 4px}
@@ -377,10 +385,21 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
         </div>
       </div>
 
+      <!-- O PREÇO: o que a força dominante já cobrou. Passado e presente, nunca previsão. -->
+      <div class="preco-bloco" id="rPreco" style="display:none">
+        <div class="cab">O que isso já te custou</div>
+        <p class="frase" id="rPrecoTxt">—</p>
+        <div class="corte">
+          <span class="lbl">Isso tem nome no seu mapa</span>
+          <span class="oculto">████████████████████</span>
+        </div>
+        <p class="fecho">Não é um defeito seu. É o outro lado da sua maior força — e as duas nascem no mesmo lugar.</p>
+      </div>
+
       <!-- CURIOSITY GAP -->
       <div class="locked" id="lockedZone">
-        <div class="locked-h" id="lockedH">Duas peças suas já foram calculadas.</div>
-        <div class="locked-sub">Uma diz <b>como você funciona</b> — a figura que te representa, uma entre doze. A outra diz <b>de que Brasil você veio</b> — a alma brasileira, e essa lista a gente não conta. São coisas diferentes, e você tem as duas.</div>
+        <div class="locked-h" id="lockedH">O nome disso já está calculado.</div>
+        <div class="locked-sub">Duas figuras foram calculadas a partir do que você digitou. Uma diz <b>como você funciona</b> — uma entre doze. A outra diz <b>de que Brasil você veio</b> — e essa lista a gente não conta. Junto com elas vem o resto do seu mapa:</div>
         <div class="reveal-grid" id="revealGrid"></div>
 
         <div class="gate">
@@ -628,6 +647,91 @@ else{$('urgencyBar').textContent=CONFIG.LAUNCH_TEXT;}
 
 let CURRENT=null, PREVIA=null, PERFIL=null, TOKEN=null, POLL=null;
 
+/* ===== O PREÇO =====
+   O que a força dominante da pessoa já cobrou dela. Fala SEMPRE do que já
+   aconteceu ou do que acontece hoje — nunca do futuro. Este produto é
+   entretenimento e não prevê nada; prometer futuro seria mentira e daria medo
+   a quem está fragilizado. A urgência aqui vem de reconhecimento, não de susto.
+   Todas as frases terminam sem culpar a pessoa: o fecho fixo do bloco diz que
+   não é defeito, é o outro lado da força. */
+const PRECOS={
+  cuidado:'Você já ficou sem para alguém não ficar sem. E não avisou ninguém — porque avisar pareceria cobrança.',
+  sensibilidade:'Você já levou pro lado pessoal uma coisa que nem era com você, e passou a noite inteira remoendo aquilo.',
+  lealdade:'Você ficou tempo demais onde já não te queriam bem, porque ir embora parecia trair.',
+  independencia:'Você aprendeu a não pedir. E hoje as pessoas acham que você não precisa — quando muitas vezes precisava.',
+  liberdade:'Você já saiu de coisas boas só porque começaram a parecer uma gaiola.',
+  intensidade:'Você passa a vida abaixando o seu próprio volume para não assustar quem está do lado.',
+  ambicao:'Você já adiou a sua vida pessoal por uma conquista que, quando veio, durou muito menos do que a espera.',
+  disciplina:'Você terminou coisas que já não fazia sentido terminar, só porque desistir não estava no seu vocabulário.',
+  harmonia:'Você já engoliu o que pensava para não estragar o clima — e depois carregou aquilo por semanas.',
+  franqueza:'Você já falou a sua verdade na hora errada e viu uma porta se fechar por causa disso.',
+  sinceridade:'Você nunca soube fingir que gostou. Isso te custou convites, e você nem sempre soube por quê.',
+  acao:'Você já se jogou antes de pensar e passou meses arrumando o que dez minutos de calma teriam evitado.',
+  analise:'Você já perdeu uma coisa boa por pensar demais. Quando decidiu, já era de outro.',
+  impeto:'Você enxergou a jogada inteira e mesmo assim foi antes da hora — de novo.',
+  poder:'Você segura tudo sozinho porque soltar dá mais medo do que cansar. E o cansaço já chegou.',
+  lideranca:'Todo mundo assume que você conduz. Ninguém pergunta se você queria.',
+  rebeldia:'Você desconfia de tudo que é "sempre foi assim" — inclusive de gente que só queria te ajudar.',
+  aventura:'Você já trocou o que era seguro pelo que era novo, e depois sentiu falta do chão.',
+  estabilidade:'Você já ficou tempo demais num lugar que só era confortável, não bom.',
+  misterio:'As pessoas saem das conversas achando que te conhecem. Você sabe que não, e às vezes isso pesa.',
+  palco:'Você chama atenção sem esforço e se recolhe quando alguém chega perto demais. Depois estranha a distância que se formou.',
+  arte:'Você já refez uma coisa que estava boa até ela ficar tarde demais — e ninguém tinha visto diferença.',
+  carisma:'As pessoas gostam de você rápido demais, e você nunca sabe se é de você ou do que você aparenta ser.',
+  palavra:'Você sabe dizer as coisas de um jeito que fica. Já usou isso para vencer uma discussão que preferia ter perdido.',
+  diplomacia:'Você desarma tempestade só de entrar na sala. Ninguém pergunta quem desarma a sua.',
+  versatilidade:'Você dá conta de tudo, então tudo sobra pra você.',
+  inovacao:'Você enxerga um jeito melhor e cansa de explicar. Às vezes desiste antes de ser entendido.',
+  inspiracao:'Você levanta todo mundo. Nos seus dias ruins, não sabe a quem pedir o mesmo.',
+  filosofia:'Você pensa fundo demais para conversa de mesa, e aprendeu a guardar metade do que pensa.',
+  sensualidade:'Você atrai sem tentar, e já foi visto pelo que provoca em vez do que é.',
+  precisao:'Um detalhe torto te tira do sério, e você já brigou por coisa que ninguém mais tinha visto.',
+  sonho:'Você tem uma vida inteira acontecendo na sua cabeça que quase ninguém de fora conhece.',
+  generosidade:'Você divide antes de pensar em si. Já se apertou por isso mais de uma vez.',
+  paixao:'Você não se envolve pela metade — e por isso as suas quedas doem em dobro.',
+  coragem:'Você encara o que a maioria evita, e ninguém percebe o quanto isso te custa por dentro.',
+  resiliencia:'Você aguenta tanto que as pessoas pararam de perguntar se estava tudo bem.',
+  servico:'Você resolve a vida de todo mundo. A sua fica pra depois, e depois nunca chega.',
+  justica:'Você não deixa passar uma injustiça, mesmo quando o custo de brigar era só seu.',
+  curiosidade:'Você começa muito mais do que termina. Não é preguiça — é apetite, e ele te deixa cheio de coisas pela metade.',
+  crescimento:'Você não consegue ser a mesma pessoa dois anos seguidos, e já perdeu gente que gostava da anterior.',
+  tradicao:'Você guarda com carinho coisas que já não te servem, só porque vieram de antes.',
+  estrategia:'Você planeja tanto que às vezes o momento passa enquanto o plano fica pronto.',
+  esperteza:'Você sempre acha uma saída. Já usou isso para escapar de conversas que precisava ter.',
+  intuicao:'Você sentiu que era assim antes de qualquer prova — e se calou, porque não saberia explicar.',
+  visao:'Você enxerga longe demais e vive impaciente com o presente de quem está do seu lado.',
+  otimismo:'Você acha saída onde já desistiram. Já ouviu que é ingenuidade de gente que não viu a sua conta.',
+  sobrevivencia:'Você aprendeu cedo a se virar por conta própria. Ninguém aprende isso por escolha.',
+  familia:'Você põe os seus na frente de tudo, inclusive na frente de você.',
+  etica:'Você já perdeu oportunidade por não conseguir passar por cima de ninguém. E faria de novo.'
+};
+
+/* Fatores de espalhamento: sem eles, 'disciplina' e 'sensibilidade' apareciam
+   em 1 de cada 4 mapas. Mesma técnica dos 13 arquétipos. Rode ferramentas/
+   calibrar-preco.mjs depois de mexer em PRECOS, etiquetas ou pesos. */
+const FATOR_PRECO={"cuidado":0,"sensibilidade":0,"lealdade":0,"independencia":0,"liberdade":0,"intensidade":0,"ambicao":0,"disciplina":0,"harmonia":0,"franqueza":0,"sinceridade":0,"acao":0,"analise":0,"impeto":0,"poder":0,"lideranca":0,"rebeldia":3.5625849933818945e+35,"aventura":0,"estabilidade":0,"misterio":0,"palco":0,"arte":0,"carisma":0,"palavra":0,"diplomacia":0,"versatilidade":0,"inovacao":2.806907510024239e+35,"inspiracao":0,"filosofia":0,"sensualidade":0,"precisao":0,"sonho":0,"generosidade":0,"paixao":0,"coragem":0,"resiliencia":0,"servico":0,"justica":0,"curiosidade":0,"crescimento":36254317077657720000,"tradicao":0,"estrategia":0,"esperteza":1.7905679581528066e+34,"intuicao":0,"visao":0,"otimismo":0,"sobrevivencia":1.4255281644708986e+34,"familia":0,"etica":27953109740897650000};
+
+/* A força mais alta depois da normalização. Empate exato desempata pela
+   semente da pessoa — determinístico, nunca aleatório. */
+function renderPreco(w,seed){
+  /* Preferência: um dos dois lados do atrito que acabou de ser nomeado.
+     Só cai no geral se nenhum dos dois tiver frase escrita. */
+  const doAtrito=(ATRITO_LADOS||[]).filter(t=>PRECOS[t]&&w[t]);
+  const base=doAtrito.length?doAtrito:Object.keys(w).filter(t=>PRECOS[t]);
+  const cand=base.map(t=>({t,s:w[t]*(FATOR_PRECO[t]||1)}));
+  if(!cand.length){$('rPreco').style.display='none';return;}
+  const max=Math.max(...cand.map(x=>x.s));
+  const emp=cand.filter(x=>Math.abs(x.s-max)<1e-9);
+  const esc=emp.length===1?emp[0]:emp.sort((a,b)=>desempatePreco(a.t,seed)-desempatePreco(b.t,seed))[0];
+  $('rPrecoTxt').textContent=PRECOS[esc.t];
+  $('rPreco').style.display='block';
+}
+function desempatePreco(r,seed){
+  let h=(seed>>>0)||1;
+  for(let i=0;i<r.length;i++){h^=r.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+  return h>>>0;
+}
+
 /* ===== O ATRITO =====
    Interpretação que ABRE. Cada linha nomeia uma contradição interna real e para ali.
    Nada aqui revela arquétipo, personagem, kryptonita ou missão — a resolução é paga.
@@ -665,20 +769,25 @@ function acharAtrito(w){
     const pa=w[a]||0,pb=w[b]||0;
     if(!pa||!pb)continue;
     const s=Math.min(pa,pb);          // a tensão só existe se as DUAS forças forem fortes
-    if(s>score){score=s;melhor=frase;}
+    if(s>score){score=s;melhor={frase,lados:[a,b]};}
   }
   return melhor;
 }
 
+/* Guarda os dois lados do atrito para o bloco do preço usar. Assim os dois
+   blocos contam UMA história — a contradição, e o que o lado mais forte cobra —
+   em vez de duas observações soltas. */
+let ATRITO_LADOS=null;
 function renderAtrito(w){
-  const frase=acharAtrito(w);
-  if(!frase){
+  const r=acharAtrito(w);
+  ATRITO_LADOS=r?r.lados:null;
+  if(!r){
     const t=topTags(w,2);
     if(t.length<2){$('rAtrito').style.display='none';return;}
     $('rAtritoTxt').textContent='As suas duas forças mais altas puxam para o mesmo lado. '+
       'Isso te dá uma clareza que pouca gente tem — e te deixa sem plano B quando essa direção falha.';
   }else{
-    $('rAtritoTxt').textContent=frase;
+    $('rAtritoTxt').textContent=r.frase;
   }
   $('rAtrito').style.display='block';
 }
@@ -797,7 +906,8 @@ function renderPrevia(){
   $('rTeaser').innerHTML=`<span class="drop">${nomeBonito(c.primeiro)[0]}</span>${nomeBonito(c.primeiro).slice(1)}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
   $('rBarnumTxt').textContent=barnumFrase(c,PREVIA.tt,PREVIA.seed);
   renderFatos(c);
-  if(PERFIL){$('rAtrito').style.display='none';}else{renderAtrito(PREVIA.w);}
+  if(PERFIL){$('rAtrito').style.display='none';$('rPreco').style.display='none';}
+  else{renderAtrito(PREVIA.w);renderPreco(PREVIA.w,PREVIA.seed);}
   carregarGancho(c);
 
   // Os valores reais NÃO estão no navegador. Os blocos têm tamanho variável
