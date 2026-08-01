@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Descubra quem você realmente é — Mapa da Alma</title>
-<meta name="description" content="Em 30 segundos, a partir do seu nome e da sua data de nascimento: seu arquétipo, seu personagem, sua carta do Tarô e muito mais. Prévia grátis." />
+<meta name="description" content="Em 30 segundos, a partir do seu nome e da sua data de nascimento: quem você é entre os doze, o seu personagem, a sua carta do Tarô e muito mais. Prévia grátis." />
 <link rel="icon" type="image/png" href="img/favicon.png" />
 <link rel="apple-touch-icon" href="img/favicon.png" />
 <meta name="theme-color" content="#f4ecd8" />
@@ -372,7 +372,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
         <div class="tag">A contradição que mora em você</div>
         <p id="rAtritoTxt">—</p>
         <div class="corte">
-          <span>E é desse atrito que nasce o seu <b>arquétipo</b> — um entre doze.</span>
+          <span>E é desse atrito que nasce <b>a figura que te representa</b> — uma entre doze.</span>
           <div class="blocos">███████████████</div>
         </div>
       </div>
@@ -380,14 +380,14 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
       <!-- CURIOSITY GAP -->
       <div class="locked" id="lockedZone">
         <div class="locked-h" id="lockedH">Duas peças suas já foram calculadas.</div>
-        <div class="locked-sub">O <b>arquétipo</b> diz como você funciona — um entre doze. A <b>alma brasileira</b> diz de que Brasil você veio — e essa lista a gente não conta. São coisas diferentes, e você tem as duas.</div>
+        <div class="locked-sub">Uma diz <b>como você funciona</b> — a figura que te representa, uma entre doze. A outra diz <b>de que Brasil você veio</b> — a alma brasileira, e essa lista a gente não conta. São coisas diferentes, e você tem as duas.</div>
         <div class="reveal-grid" id="revealGrid"></div>
 
         <div class="gate">
           <div class="flag">Oferta de lançamento</div>
           <div class="stack">
             <div><span class="ck">✓</span> <strong>Sua alma brasileira</strong> — qual figura do nosso povo vive em você</div>
-            <div><span class="ck">✓</span> <strong>Seu arquétipo</strong> — qual dos doze você é, e o lema que rege a sua vida</div>
+            <div><span class="ck">✓</span> <strong>Quem você é entre os doze</strong> — a figura que te representa, e o lema que rege a sua vida</div>
             <div><span class="ck">✓</span> O personagem da ficção brasileira que é a sua cara</div>
             <div><span class="ck">✓</span> O filme, o livro, a série, a novela e a música da sua vida</div>
             <div><span class="ck">✓</span> Sua leitura de personalidade completa — forças e sombras</div>
@@ -434,7 +434,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
         </div>
 
         <div class="arq-reveal" style="margin-top:22px">
-          <div class="lbl">E entre os doze arquétipos, você é</div>
+          <div class="lbl">E entre os doze, você é</div>
           <div class="nome" id="uArqNome" style="font-size:clamp(24px,5.4vw,34px)">—</div>
           <p class="lema" id="uArqLema">—</p>
           <p class="porque" id="uArqPorque">—</p>
@@ -479,7 +479,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
 
         <!-- CARD COMPARTILHÁVEL -->
         <div class="share-box">
-          <h3>Mostre o seu arquétipo</h3>
+          <h3>Mostre quem você é</h3>
           <p>Um card pronto pro story. Cada pessoa que vir o seu vai querer saber o dela.</p>
           <img id="sharePreview" alt="Prévia do card do seu Mapa da Alma"/>
           <canvas id="shareCanvas" width="1080" height="1350"></canvas>
@@ -487,7 +487,7 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
             <button class="btn gold" id="shareBtn">✦ Compartilhar meu Mapa</button>
             <button class="btn ghost" id="shareDl">⤓ Baixar a imagem</button>
           </div>
-          <p class="hint" id="shareHint">O card sai com o seu arquétipo, o seu lema e o seu signo.</p>
+          <p class="hint" id="shareHint">O card sai com a sua figura, o seu lema e o seu signo.</p>
         </div>
 
         <!-- UPSELL: Almanaque Minha História -->
@@ -557,6 +557,16 @@ function fbTrackUmaVez(chave,evento,dados){
 /* ---------- utilidades ---------- */
 function stripAccents(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ç/gi,'c');}
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase();}
+/* Caixa de nome próprio: quem digita TUDO EM CAIXA ALTA não deve ver o mapa gritando.
+   Partículas ficam minúsculas; d'Ávila e D'Angelo mantêm a letra depois do apóstrofo. */
+const PARTICULAS=['de','da','do','das','dos','e','di','du','del','della','van','von','y','a'];
+function nomeBonito(s){
+  return String(s||'').trim().split(/\s+/).map((p,i)=>{
+    const b=p.toLowerCase();
+    if(i>0&&PARTICULAS.includes(b))return b;
+    return b.replace(/(^|[-'’])([a-zà-ÿ])/g,(m,x,c)=>x+c.toUpperCase());
+  }).join(' ');
+}
 function blocos(n){n=Number(n);if(!Number.isFinite(n))n=8;return '█'.repeat(Math.min(40,Math.max(4,Math.floor(n))));}
 
 const ZODIAC=[['Capricórnio',1,1,1,19],['Aquário',1,20,2,18],['Peixes',2,19,3,20],['Áries',3,21,4,19],['Touro',4,20,5,20],['Gêmeos',5,21,6,20],['Câncer',6,21,7,22],['Leão',7,23,8,22],['Virgem',8,23,9,22],['Libra',9,23,10,22],['Escorpião',10,23,11,21],['Sagitário',11,22,12,21],['Capricórnio',12,22,12,31]];
@@ -780,11 +790,11 @@ function gerarPrevia(){
 
 function renderPrevia(){
   const c=CURRENT;
-  $('rName').textContent=c.nome;
+  $('rName').textContent=nomeBonito(c.nome);
   $('rSigno').textContent=c.signo;
   $('rChines').textContent=c.elemento+' · '+c.animal;
   $('rCaminho').textContent=c.lp;
-  $('rTeaser').innerHTML=`<span class="drop">${c.primeiro[0]}</span>${c.primeiro}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
+  $('rTeaser').innerHTML=`<span class="drop">${nomeBonito(c.primeiro)[0]}</span>${nomeBonito(c.primeiro).slice(1)}, você é ${SIGNO[c.signo].desc} No zodíaco chinês, um <strong>${c.animal} de ${c.elemento}</strong> — ${ANIMAL[c.animal].adj}. Mas isso é só a capa: o seu nome e a sua data guardam números que dizem coisas bem mais específicas.`;
   $('rBarnumTxt').textContent=barnumFrase(c,PREVIA.tt,PREVIA.seed);
   renderFatos(c);
   if(PERFIL){$('rAtrito').style.display='none';}else{renderAtrito(PREVIA.w);}
@@ -794,7 +804,7 @@ function renderPrevia(){
   // por pessoa só para parecerem o que são: um texto escondido.
   const s=PREVIA.seed;
   const rev=[
-    ['★ Seu arquétipo — quem você é entre os doze',9+(s%9)],
+    ['★ Quem você é entre os doze',9+(s%9)],
     ['O lema que rege a sua vida',18+(s>>>3)%12],
     ['O personagem que você seria',6+(s>>>5)%8],
     ['Seu superpoder secreto',14+(s>>>7)%12],
@@ -1264,7 +1274,7 @@ function gerarPDF(){
     y+=6;para('São figuras da história e da cultura popular brasileira — tipos do nosso povo, não entidades.',10,ink,'italic');
     y+=10;
   }
-  head('E entre os doze arquétipos, você é');
+  head('E entre os doze, você é');
   doc.setFont('times','bold');doc.setFontSize(24);doc.setTextColor(...navy);
   doc.splitTextToSize(P.arquetipo.nome,W-2*M).forEach(l=>{doc.text(l,W/2,y+14,{align:'center'});y+=30;});
   doc.setFont('times','italic');doc.setFontSize(13);doc.setTextColor(...ink);
