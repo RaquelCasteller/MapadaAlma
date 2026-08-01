@@ -120,6 +120,21 @@
   .upsell h3{font-family:"Playfair Display",serif;color:#f2d78a;font-size:30px;margin:6px 0}
   .upsell .old{text-decoration:line-through;opacity:.55}
   .upsell .new{font-family:"Playfair Display",serif;font-size:46px;color:#f2d78a}
+  /* AMOSTRA DO ALMANAQUE — o produto precisa APARECER, não ser descrito. */
+  .alm-partes{text-align:left;margin:18px 0 6px}
+  .alm-parte{border-top:1px solid rgba(242,215,138,.28);padding:13px 0}
+  .alm-parte .n{font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.13em;color:#c9a94f;display:block;margin-bottom:3px}
+  .alm-parte .t{font-family:"Playfair Display",serif;font-size:20px;color:#f2d78a;display:block;margin-bottom:5px}
+  .alm-parte .d{font-size:16px;opacity:.86;line-height:1.45;margin:0}
+  .alm-amostra{background:#f4ecd8;color:#2b2218;padding:20px 18px;margin:20px 0 6px;text-align:left;border:1px solid var(--gold)}
+  .alm-amostra .sel{font-family:"Special Elite",monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:#8a6d2f;text-align:center;display:block;margin-bottom:14px}
+  .alm-amostra h4{font-family:"Playfair Display",serif;font-size:17px;margin:14px 0 7px;text-align:center;letter-spacing:.02em}
+  .alm-amostra h4:first-of-type{margin-top:0}
+  .alm-amostra table{width:100%;border-collapse:collapse;font-size:16px}
+  .alm-amostra td{padding:4px 0;border-bottom:1px dotted rgba(43,34,24,.22)}
+  .alm-amostra td:last-child{text-align:right;font-family:"Special Elite",monospace;font-size:14px}
+  .alm-amostra .tags{font-size:16px;line-height:1.7;text-align:center;margin:0}
+  .alm-amostra .cap{font-size:13px;font-style:italic;opacity:.7;text-align:center;margin:16px 0 0;line-height:1.4}
   .coupon{display:inline-block;border:2px dashed var(--gold);color:#f2d78a;font-family:"Special Elite",monospace;letter-spacing:.14em;padding:8px 16px;margin:8px 0}
   .timer{font-family:"Special Elite",monospace;color:#e8b4a0;letter-spacing:.08em}
   .foot{text-align:center;color:var(--ink-soft);font-size:13px;font-style:italic;margin-top:44px}
@@ -267,6 +282,23 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
     </div>
   </section>
 
+
+  <!-- ================= PAGAMENTO NÃO CONCLUÍDO =================
+       O Mercado Pago volta com ?falhou=1 quando o pagamento é recusado ou
+       cancelado. Antes, essa volta caía na tela de "aguardando" e ficava
+       consultando o status por 4min30 até dizer que o mapa iria por e-mail —
+       um e-mail que nunca chegaria. -->
+  <section id="falhou" style="display:none">
+    <div class="card aguardando">
+      <img class="selo" src="img/selo.png" alt="" style="animation:none"/>
+      <h2 id="falhouTitulo">O pagamento não foi concluído</h2>
+      <p id="falhouTexto">O seu mapa continua reservado. Se você cancelou ou o cartão não passou, dá para tentar de novo agora — nada foi cobrado.</p>
+      <div class="cod" id="falhouCodigo">—</div>
+      <button class="btn" id="falhouTentar" style="margin-top:20px;max-width:320px;display:inline-block">Tentar o pagamento de novo</button>
+      <p style="margin-top:16px;font-size:15px">Se você já pagou e caiu aqui por engano, <strong>não pague de novo</strong> — responda o e-mail da compra que a gente resolve.</p>
+      <button class="btn ghost" id="falhouVoltar" style="margin-top:14px;max-width:260px;display:inline-block">Voltar ao início</button>
+    </div>
+  </section>
 
   <!-- ================= PEDIDO DO ALMANAQUE CONFIRMADO ================= -->
   <section id="almOk" style="display:none">
@@ -513,7 +545,41 @@ src="https://www.facebook.com/tr?id=1685530262744336&ev=PageView&noscript=1"
         <div class="upsell">
           <div class="flag">Só para quem já é cliente</div>
           <h3>Almanaque Minha História</h3>
-          <p style="margin:4px 0 12px;opacity:.92">Você acabou de descobrir <em>quem é</em>. Agora imagine receber a sua <strong>vida inteira contada assim</strong>: o dia exato em que você nasceu, a sua infância, a sua adolescência e o Brasil de cada uma dessas épocas — pesquisado à mão, adaptado à sua região, entregue como uma peça de acervo em <strong>3 dias úteis</strong>.</p>
+          <p style="margin:4px 0 14px;opacity:.92">O Mapa da Alma diz <em>quem você é</em>. O Almanaque conta <strong>de onde você veio</strong> — o Brasil exato que você viveu, ano por ano, do dia em que você nasceu até a sua adolescência.</p>
+
+          <div class="alm-partes">
+            <div class="alm-parte"><span class="n">PARTE 1</span><span class="t">O dia em que você chegou ao mundo</span>
+              <p class="d">Quem governava o país, o seu estado e a sua cidade. Quanto custava o pão, a gasolina, o cafezinho e um carro zero. O que era notícia. Quem foi campeão. Que dia da semana era, e que fase a lua fazia.</p></div>
+            <div class="alm-parte"><span class="n">PARTE 2</span><span class="t">A primeira infância</span>
+              <p class="d">Os brinquedos, os desenhos, a novela das seis, os doces do bar da esquina e as brincadeiras de rua da <em>sua</em> região — não de um Brasil genérico.</p></div>
+            <div class="alm-parte"><span class="n">PARTE 3</span><span class="t">A melhor fase</span>
+              <p class="d">As músicas que tocavam quando você tinha quinze anos. Os lugares onde a sua turma ia. As gírias que só a sua época usava. A comida da sua terra.</p></div>
+            <div class="alm-parte"><span class="n">PARTE 4</span><span class="t">Quem é você</span>
+              <p class="d">Signo solar, signo chinês, numerologia do nome e da data, e o personagem da ficção brasileira que combina com tudo isso.</p></div>
+          </div>
+
+          <div class="alm-amostra">
+            <span class="sel">✦ ❦ ✦ &nbsp; trecho real de um almanaque de 1971 &nbsp; ✦ ❦ ✦</span>
+
+            <h4>Quanto custava a vida</h4>
+            <table>
+              <tr><td>Salário mínimo</td><td>Cr$ 225,60</td></tr>
+              <tr><td>Pão francês (unid.)</td><td>Cr$ 0,25</td></tr>
+              <tr><td>Cafezinho</td><td>Cr$ 0,30</td></tr>
+              <tr><td>Ingresso de cinema</td><td>Cr$ 3,00</td></tr>
+              <tr><td>Fusca 0 km</td><td>Cr$ 12.290</td></tr>
+            </table>
+
+            <h4>Brinquedos &amp; brincadeiras</h4>
+            <p class="tags">Autorama · pião · bila · pipa<br/>carrinho de rolimã ladeira abaixo<br/>amarelinha, pique-esconde e queimada na rua</p>
+
+            <h4>Gírias da época</h4>
+            <p class="tags">“Uai!” · “Trem bom!” · “Nó!” · “Sô!”<br/>“É de lascar!” · “Cê tá doido?”</p>
+
+            <p class="cap">Cada almanaque é diferente. Este é de quem nasceu em Sabará, Minas Gerais.<br/>O seu vem com a sua cidade, o seu ano e a sua região.</p>
+          </div>
+
+          <p style="margin:16px 0 12px;opacity:.9;font-size:17px">Não é gerado por computador. A pesquisa é <strong>feita à mão, um por vez</strong> — por isso demora <strong>3 dias úteis</strong>. Chega em PDF, pronto para imprimir, encadernar e presentear.</p>
           <p style="margin:0 0 10px;opacity:.85;font-style:italic">Seus R$ 9,99 já valeram: eles viram R$ 15 de desconto aqui.</p>
           <p><span class="old">R$ 60,00</span> &nbsp; <span class="new">R$ 45,00</span></p>
           <div class="coupon" id="couponBox">CUPOM ————</div>
@@ -979,6 +1045,54 @@ $('irPagar').addEventListener('click',async()=>{
 });
 
 /* ---------- volta do pagamento / consulta de status ---------- */
+
+/* Pagamento recusado ou cancelado no Mercado Pago. NÃO inicia polling:
+   não há o que esperar, e a tela de espera prometia um e-mail que não viria. */
+function mostrarFalhou(token){
+  paraPolling();
+  $('landing').style.display='none';
+  $('result').style.display='none';
+  $('aguardando').style.display='none';
+  $('almOk').style.display='none';
+  $('falhou').style.display='block';
+  $('falhouCodigo').textContent='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  try{ if(window.fbq) fbq('trackCustom','PagamentoFalhou',{content_name:'Mapa da Alma'}); }catch(e){}
+  /* busca o código do pedido só para a pessoa ter uma referência */
+  if(token){
+    fetch('/.netlify/functions/status?pedido='+encodeURIComponent(token))
+      .then(r=>r.ok?r.json():null)
+      .then(d=>{
+        if(!d)return;
+        /* caso raro: falhou na ida, mas o webhook confirmou depois */
+        if(d.status==='pago'){$('falhou').style.display='none';iniciarPolling(token);return;}
+        if(d.codigo)$('falhouCodigo').textContent='Pedido '+d.codigo;
+      })
+      .catch(()=>{});
+  }
+}
+
+$('falhouVoltar').addEventListener('click',recomeçar);
+
+/* Tentar de novo: volta para a prévia com a zona de compra aberta.
+   Se o perfil não estiver mais em memória (recarregou a página), recomeça. */
+$('falhouTentar').addEventListener('click',()=>{
+  $('falhou').style.display='none';
+  try{localStorage.removeItem('mapa_token');}catch(e){}
+  history.replaceState({},'','/');
+  if(CURRENT&&PREVIA){
+    $('landing').style.display='none';
+    $('result').style.display='block';
+    $('lockedZone').style.display='block';
+    $('payOpts').style.display='';
+    $('payStep').style.display='none';
+    $('erroPay').textContent='';
+    $('lockedZone').scrollIntoView({behavior:'smooth',block:'center'});
+  }else{
+    recomeçar();
+  }
+});
+
 function mostrarAguardando(codigo){
   $('landing').style.display='none';
   $('result').style.display='none';
@@ -1216,7 +1330,7 @@ function recomeçar(){
   try{localStorage.removeItem('mapa_token');}catch(e){}
   history.replaceState({},'', '/');
   PERFIL=null;TOKEN=null;
-  $('result').style.display='none';$('aguardando').style.display='none';$('almOk').style.display='none';
+  $('result').style.display='none';$('aguardando').style.display='none';$('almOk').style.display='none';$('falhou').style.display='none';
   $('unlocked').style.display='none';$('lockedZone').style.display='block';
   $('payOpts').style.display='';$('payStep').style.display='none';
   $('sharePreview').style.display='none';$('almForm').style.display='none';
@@ -1232,6 +1346,9 @@ $('aguardVoltar').addEventListener('click',recomeçar);
   let token=p.get('pedido');
   if(!token){try{token=localStorage.getItem('mapa_token');}catch(e){}
     if(token&&!p.has('pedido'))token=null;}
+  /* O MP manda ?falhou=1 na back_url de falha. Tem que ser testado ANTES do
+     polling, senão a pessoa fica presa numa tela de espera sem saída. */
+  if(p.get('falhou')==='1'){mostrarFalhou(token);return;}
   if(token)iniciarPolling(token);
 })();
 
