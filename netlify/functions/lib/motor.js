@@ -19,8 +19,18 @@ function reduce(n){while(n>9&&n!==11&&n!==22&&n!==33){n=String(n).split('').redu
 function lifePath(y,m,d){return reduce(reduce(m)+reduce(d)+reduce(String(y).split('').reduce((a,b)=>a+ +b,0)));}
 const PYTH={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
 function expression(nm){const c=stripAccents(nm).toUpperCase().replace(/[^A-Z]/g,'');let s=0;for(const ch of c)s+=PYTH[ch]||0;return reduce(s);}
+/* Alma = vogais (o que a pessoa quer). Personalidade = consoantes (o que os outros veem).
+   Usam o nome COMPLETO — é o que finalmente faz o sobrenome pesar no cálculo. */
+const VOGAIS='AEIOU';
+function somaLetras(nm,f){const c=stripAccents(nm).toUpperCase().replace(/[^A-Z]/g,'');let s=0;for(const ch of c)if(f(ch))s+=PYTH[ch]||0;return reduce(s);}
+function almaNum(nm){return somaLetras(nm,ch=>VOGAIS.includes(ch));}
+function personaNum(nm){return somaLetras(nm,ch=>!VOGAIS.includes(ch));}
 function ageAt(y,m,d){const t=new Date();let a=t.getFullYear()-y;if(t.getMonth()+1<m||(t.getMonth()+1===m&&t.getDate()<d))a--;return a;}
-function seedNum(c){let h=2166136261>>>0;const s=(c.nome+'|'+c.y+'|'+c.m+'|'+c.d).toLowerCase();for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+/* A semente precisa ser IMUNE a variação de digitação: acento, caixa e espaço
+   duplo não podem mudar o filme da vida de ninguém. Sem isso, "José" e "Jose"
+   eram duas pessoas diferentes para o sorteio. */
+function chaveSemente(c){return stripAccents(String(c.nome)).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()+'|'+c.y+'|'+c.m+'|'+c.d;}
+function seedNum(c){let h=2166136261>>>0;const s=chaveSemente(c);for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
 function shuffleSeeded(arr,seed){const a=arr.slice();let s=(seed>>>0)||1;for(let i=a.length-1;i>0;i--){s=(Math.imul(s,1103515245)+12345)>>>0;const j=s%(i+1);const t=a[i];a[i]=a[j];a[j]=t;}return a;}
 /* ===================== DADOS ===================== */
 const SIGNO={
@@ -77,27 +87,54 @@ function presidente(y){const t=[[1940,1945,'Getúlio Vargas'],[1946,1950,'Eurico
 
 /* ===================== HELPERS DE PERFIL ===================== */
 function buildTags(c){
-  const comps=[{label:c.signo,kind:'signo',tags:SIGNO[c.signo].tags},{label:'Caminho '+c.lp,kind:'num',tags:NUM[c.lp].tags},{label:'Expressão '+c.exp,kind:'exp',tags:(NUM[c.exp]||{tags:[]}).tags},{label:c.animal,kind:'animal',tags:ANIMAL[c.animal].tags},{label:c.elemento,kind:'elem',tags:ELEM[c.elemento]}];
-  const w={};comps.forEach(cp=>{const wt=cp.kind==='num'?3:cp.kind==='signo'?2:1;cp.tags.forEach(t=>{w[t]=(w[t]||0)+wt;});});
+  const comps=[{label:c.signo,kind:'signo',tags:SIGNO[c.signo].tags},{label:'Caminho '+c.lp,kind:'num',tags:NUM[c.lp].tags},{label:'Expressão '+c.exp,kind:'exp',tags:(NUM[c.exp]||{tags:[]}).tags},{label:'Alma '+c.alma,kind:'alma',tags:(NUM[c.alma]||{tags:[]}).tags},{label:'Personalidade '+c.persona,kind:'persona',tags:(NUM[c.persona]||{tags:[]}).tags},{label:c.animal,kind:'animal',tags:ANIMAL[c.animal].tags},{label:c.elemento,kind:'elem',tags:ELEM[c.elemento]}];
+  /* PESOS — decisão deliberada, não herdada:
+     3 caminho de vida (data inteira)  2 signo  2 alma (vogais do nome completo)
+     1 expressão (primeiro nome)  1 personalidade  1 animal  1 elemento
+     A Alma pesa 2 porque é o número de nome mais determinante na tradição pitagórica;
+     a Personalidade é leitura de superfície e pesa 1. Antes desta mudança o sobrenome
+     não entrava em NENHUM cálculo: Maria Silva e Maria Nascimento do mesmo dia eram idênticas. */
+  const PESO={num:3,signo:2,alma:2,exp:1,persona:1,animal:1,elem:1};
+  const w={};comps.forEach(cp=>{const wt=PESO[cp.kind]||1;cp.tags.forEach(t=>{w[t]=(w[t]||0)+wt;});});
   return {comps,w};
 }
 function topTags(w,n){return Object.keys(w).sort((a,b)=>w[b]-w[a]).slice(0,n);}
-function attribute(itemTags,comps,max){const seen=[];['signo','animal','num','exp','elem'].forEach(kind=>{const cp=comps.find(x=>x.kind===kind&&x.tags.some(t=>itemTags.includes(t)));if(cp)seen.push(cp.label);});return seen.slice(0,max||3);}
+function attribute(itemTags,comps,max){const seen=[];['signo','animal','num','alma','exp','persona','elem'].forEach(kind=>{const cp=comps.find(x=>x.kind===kind&&x.tags.some(t=>itemTags.includes(t)));if(cp)seen.push(cp.label);});return seen.slice(0,max||3);}
 function score(itemTags,w){return itemTags.reduce((s,t)=>s+(w[t]||0),0);}
 function phrase(labels){if(!labels.length)return 'o seu conjunto de astros';if(labels.length===1)return labels[0];if(labels.length===2)return labels[0]+' e '+labels[1];return labels.slice(0,-1).join(', ')+' e '+labels[labels.length-1];}
 // escolha VARIADA: determinística por pessoa, mas diferente entre pessoas
-function pickMedia(list,w,comps,seed,off){
-  const sc=list.map(([t,tags])=>({t,tags,s:score(tags,w)})).sort((a,b)=>b.s-a.s).filter(x=>x.s>0);
+/* Desempate estável: só decide entre itens com nota EXATAMENTE igual.
+   Determinístico por pessoa, e sem favorecer quem vem primeiro na tabela. */
+function desempate(rotulo,seed){
+  let h=(seed>>>0)||1;
+  for(let i=0;i<rotulo.length;i++){h^=rotulo.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+  return h>>>0;
+}
+
+/* A escolha é ARGMAX da análise, não sorteio dentro de uma faixa.
+   O fator de normalização (FATOR_MIDIA) corrige a assimetria das tabelas —
+   mesma técnica já usada nas 13 almas. Sem ele, poucos títulos dominariam.
+   O acaso só entra em empate exato, e mesmo aí é fixo para a pessoa. */
+function pickMedia(list,w,comps,seed,off,fat){
+  const sc=list.map(([t,tags])=>({t,tags,s:score(tags,w)*((fat&&fat[t])||1)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
   if(!sc.length)return {titulo:list[0][0].replace(/^!\[|\]$/g,''),why:attribute(list[0][1],comps,3)};
-  const max=sc[0].s;let pool=sc.filter(x=>x.s>=max-2);if(pool.length<3)pool=sc.slice(0,Math.min(4,sc.length));
-  const ch=pool[(seed*7+off*131)%pool.length];
+  const max=sc[0].s;
+  const empatados=sc.filter(x=>Math.abs(x.s-max)<1e-9);
+  const ch=empatados.length===1?empatados[0]:empatados.sort((a,b)=>desempate(a.t,seed)-desempate(b.t,seed))[0];
   return {titulo:ch.t.replace(/^!\[|\]$/g,''),why:attribute(ch.tags,comps,3)};
 }
-function pickProfs(w,comps,seed){
-  const sc=PROF.map(p=>({n:p[0],tags:p[1],s:score(p[1],w)})).sort((a,b)=>b.s-a.s).filter(x=>x.s>0);
-  const fixed=sc.slice(0,2);const tail=shuffleSeeded(sc.slice(2,8),seed).slice(0,3);
-  return fixed.concat(tail).sort((a,b)=>b.s-a.s).map(p=>({nome:p.n,why:attribute(p.tags,comps,3)}));
+/* As 5 profissões são simplesmente as 5 mais bem pontuadas depois da normalização.
+   Antes, 3 das 5 vinham de um embaralhamento das posições 3 a 8. */
+function pickProfs(w,comps,seed,fat){
+  const sc=PROF.map(p=>({n:p[0],tags:p[1],s:score(p[1],w)*((fat&&fat[p[0]])||1)})).filter(x=>x.s>0)
+    .sort((a,b)=>(b.s-a.s)||(desempate(a.n,seed)-desempate(b.n,seed)));
+  return sc.slice(0,5).map(p=>({nome:p.n,why:attribute(p.tags,comps,3)}));
 }
+/* Fatores de normalização das tabelas — gerados por calibrar-midia.mjs.
+   Existem para que a escolha possa ser ARGMAX puro sem que poucos títulos
+   dominem. Mexeu em MIDIA, PROF, etiqueta ou peso? Rode o script de novo. */
+const FATOR_MIDIA={"1984":1.381,"O Poderoso Chefão":1.023,"Cidadão Kane":0.842,"O Senhor dos Anéis":1.559,"Clube da Luta":3.388,"A Vida é Bela":0.962,"Gladiador":0.932,"O Fabuloso Destino de Amélie Poulain":0.584,"O Lobo de Wall Street":0.835,"Forrest Gump":1.325,"Matrix":1.528,"Coringa":0.976,"O Rei Leão":0.84,"Comer Rezar Amar":0.724,"Rocky, Um Lutador":0.915,"Interestelar":1.441,"O Discurso do Rei":0.732,"Uma Mente Brilhante":0.604,"Central do Brasil":0.717,"O Conde de Monte Cristo":0.875,"Dom Casmurro":1.282,"Cem Anos de Solidão":1.065,"Grande Sertão: Veredas":1.319,"O Pequeno Príncipe":0.877,"O Alquimista":0.829,"A Arte da Guerra":0.963,"Orgulho e Preconceito":0.658,"Capitães da Areia":0.962,"Vidas Secas":0.928,"O Nome da Rosa":0.768,"A Hora da Estrela":0.921,"O Cortiço":1.127,"Ensaio Sobre a Cegueira":1.325,"O Diário de Anne Frank":1.198,"Torto Arado":0.984,"A Moreninha":0.898,"Mad Men":1.109,"Breaking Bad":1.033,"The Crown":0.743,"Sherlock":0.99,"Friends":1.02,"La Casa de Papel":1.667,"Stranger Things":1.337,"The Office":0.98,"Peaky Blinders":1.03,"Anne with an E":0.6,"Vikings":0.832,"Dark":1.058,"Grey's Anatomy":0.835,"Ted Lasso":1.193,"Cobra Kai":0.628,"Fleabag":1.002,"The Last of Us":1.206,"Round 6":1.293,"Renascer":0.644,"Avenida Brasil":1.394,"Vale Tudo":0.854,"Tieta":1.014,"O Clone":0.844,"Gabriela":0.845,"Rei do Gado":1.044,"Roque Santeiro":1.512,"Senhora do Destino":0.965,"Terra Nostra":1.546,"A Favorita":1.164,"Império":0.863,"Cheias de Charme":0.831,"Caras e Bocas":0.7,"Pantanal":1.49,"A Viagem":0.724,"Laços de Família":1.004,"O Bem-Amado":1.209,"Raul Seixas":1.192,"Chico Buarque":0.771,"Cartola":0.792,"Elis Regina":0.987,"Tim Maia":1.225,"Cazuza":1.854,"Legião Urbana":0.992,"Roberto Carlos":1.199,"Gilberto Gil":0.845,"Marisa Monte":0.734,"Racionais MC's":1.229,"Beethoven":0.634,"Rita Lee":0.907,"Djavan":0.879,"Adoniran Barbosa":0.718,"Clara Nunes":1.197,"Belchior":1.326,"Ivete Sangalo":1.173};
+const FATOR_PROF={"Empreendedor(a) / fundador(a)":1.115,"Advogado(a) / promotor(a)":1.044,"Executivo(a) / CEO":0.752,"Publicidade / marketing":0.836,"Político(a) / líder de causa":0.955,"Palestrante / criador(a) de conteúdo":1.074,"Médico(a) / enfermeiro(a)":0.853,"Professor(a) / educador(a)":0.896,"Psicólogo(a) / terapeuta":0.784,"Artista / músico(a)":0.896,"Escritor(a) / roteirista":0.995,"Designer / arquiteto(a)":0.96,"Cientista / pesquisador(a)":1.28,"Engenheiro(a)":0.896,"Militar / segurança":1.421,"Chef / gastronomia":0.895,"Diplomata / mediador(a) / RH":1.671,"Explorador(a) / guia de turismo":0.895,"Investidor(a) / mercado financeiro":0.959,"Jornalista":1.638,"Ator / atriz":0.767,"Vendedor(a) / negociador(a)":1.023,"Líder espiritual / coach":1.008,"Administrador(a) / contador(a)":0.96};
 const WHYTPL=['combina com','fala direto com','tem a cara de','ecoa','é a trilha de'];
 
 const SUPER={poder:'transformar "impossível" em cronograma',lideranca:'fazer uma sala inteira te seguir sem pedir',palavra:'convencer qualquer um em três frases',carisma:'iluminar o ambiente só de entrar',coragem:'agir enquanto os outros ainda pensam',acao:'resolver hoje o que os outros adiam pra amanhã',analise:'enxergar o padrão que ninguém viu',intuicao:'sentir a verdade antes de ela ser dita',sensibilidade:'entender as pessoas por dentro',arte:'transformar sentimento em beleza',disciplina:'terminar o que todo mundo desistiu',resiliencia:'levantar mais forte depois de cada queda',estrategia:'ganhar o jogo três lances antes',liberdade:'achar a saída onde só há paredes',aventura:'transformar qualquer dia comum em história',cuidado:'fazer qualquer um se sentir em casa',visao:'ver o futuro chegando antes de todo mundo',inovacao:'inventar a saída que ninguém tinha pensado',ambicao:'mirar alto e não parar até chegar lá',justica:'defender quem precisa sem pensar duas vezes'};
@@ -170,7 +207,7 @@ function barnumFrase(c,tt,seed){
 function analisaSobrenome(nomeCompleto){
   const parts=nomeCompleto.trim().split(/\s+/).filter(p=>!/^(de|da|do|das|dos|e)$/i.test(p));
   const sobs=parts.slice(1);
-  for(let i=sobs.length-1;i>=0;i--){const key=stripAccents(sobs[i]).toLowerCase();if(SOBRENOME[key])return {nome:sobs[i],texto:SOBRENOME[key],nivel:1};}
+  for(let i=sobs.length-1;i>=0;i--){const key=stripAccents(sobs[i]).toLowerCase();if(SOBRENOME[key])return {nome:cap(sobs[i]),texto:SOBRENOME[key],nivel:1};}
   if(sobs.length){
     const raw=sobs[sobs.length-1];const k=stripAccents(raw).toLowerCase();let cl=null;
     if(/(es|ez)$/.test(k))cl='é um sobrenome patronímico — dos que nasceram de "filho de", carregando o nome do antepassado como herança e continuidade.';
@@ -178,8 +215,8 @@ function analisaSobrenome(nomeCompleto){
     else if(/(ski|czak|wicz|czyk)$/.test(k))cl='guarda a marca das famílias eslavas (polonesas, ucranianas) que ajudaram a colonizar o Sul do Brasil.';
     else if(/(eira|oso|osa|al|edo)$/.test(k))cl='é um sobrenome toponímico — dos que nasceram do lugar, da árvore ou da paisagem de origem da família. Fala de raízes fincadas numa terra.';
     else if(/(inho|inha)$/.test(k))cl='traz o diminutivo afetuoso, o "pequeno" que virou nome de família — sinal de uma linhagem contada com carinho.';
-    if(cl)return {nome:raw,texto:cl,nivel:2};
-    return {nome:raw,texto:'é um sobrenome raro no Brasil — dos que quase ninguém divide com você. Nomes assim guardam histórias de família que não se repetem em cada esquina, e combinam com quem nunca foi feito para ser mais um na multidão.',nivel:3};
+    if(cl)return {nome:cap(raw),texto:cl,nivel:2};
+    return {nome:cap(raw),texto:'é um sobrenome raro no Brasil — dos que quase ninguém divide com você. Nomes assim guardam histórias de família que não se repetem em cada esquina, e combinam com quem nunca foi feito para ser mais um na multidão.',nivel:3};
   }
   return null;
 }
@@ -189,36 +226,38 @@ function analisaSobrenome(nomeCompleto){
    [nome, artigo, valor, tags, texto] */
 const RAIZ = [
   ['Malandro','do','Astúcia',['esperteza','versatilidade','carisma','sobrevivencia','estrategia'],
-   'Você acha a saída quando a porta está fechada. Não por sorte: você lê a situação antes dela acontecer, e sabe que jeitinho bem-dado é uma forma de inteligência. O risco é confiar tanto na improvisação que você deixa de construir o que dá trabalho.',0.3803],
+   'Você acha a saída quando a porta está fechada. Não por sorte: você lê a situação antes dela acontecer, e sabe que jeitinho bem-dado é uma forma de inteligência. O risco é confiar tanto na improvisação que você deixa de construir o que dá trabalho.',0.694],
   ['Cangaceiro','do','Coragem',['coragem','rebeldia','lideranca','poder','justica','impeto'],
-   'Você não abaixa a cabeça para quem não merece. Quando algo te parece injusto, você age — e arrasta gente com você, mesmo sem ter pedido para liderar. A conta vem no cansaço de quem nunca se permite recuar.',0.3086],
+   'Você não abaixa a cabeça para quem não merece. Quando algo te parece injusto, você age — e arrasta gente com você, mesmo sem ter pedido para liderar. A conta vem no cansaço de quem nunca se permite recuar.',0.4879],
   ['Benzedeira','da','Cura',['cuidado','intuicao','sensibilidade','servico','generosidade'],
-   'As pessoas saem de perto de você mais leves do que chegaram, e quase nunca sabem explicar por quê. Você sente o que não foi dito e cuida antes de ser chamado. O que falta é lembrar que você também precisa de colo.',0.219],
+   'As pessoas saem de perto de você mais leves do que chegaram, e quase nunca sabem explicar por quê. Você sente o que não foi dito e cuida antes de ser chamado. O que falta é lembrar que você também precisa de colo.',0.3767],
   ['Tropeiro','do','Adaptação',['aventura','resiliencia','versatilidade','independencia','liberdade'],
-   'Você se ajusta a qualquer terreno e não perde o rumo por causa de imprevisto. Estrada nova não te assusta: te acorda. O perigo é seguir viagem para não ter que ficar e resolver.',0.2534],
+   'Você se ajusta a qualquer terreno e não perde o rumo por causa de imprevisto. Estrada nova não te assusta: te acorda. O perigo é seguir viagem para não ter que ficar e resolver.',0.3769],
   ['Vaqueiro','do','Perseverança',['disciplina','resiliencia','estabilidade','etica','sobrevivencia','lealdade'],
-   'Você termina o que começa mesmo depois que a vontade acabou. Não faz barulho, não pede plateia, e é em você que os outros se apoiam quando tudo balança. O preço é aguentar mais do que devia antes de pedir ajuda.',0.345],
+   'Você termina o que começa mesmo depois que a vontade acabou. Não faz barulho, não pede plateia, e é em você que os outros se apoiam quando tudo balança. O preço é aguentar mais do que devia antes de pedir ajuda.',0.5037],
   ['Capoeirista','do','Equilíbrio',['harmonia','diplomacia','esperteza','crescimento','acao'],
-   'Você desarma tensão com jogo de corpo, não com força. Sabe recuar para avançar melhor, e transforma conflito em movimento. Quem não te conhece confunde a sua ginga com falta de posição.',0.5634],
+   'Você desarma tensão com jogo de corpo, não com força. Sabe recuar para avançar melhor, e transforma conflito em movimento. Quem não te conhece confunde a sua ginga com falta de posição.',0.8833],
   ['Caipira Sábio','do','Simplicidade',['filosofia','tradicao','sinceridade','estabilidade','familia'],
-   'Você desconfia de conversa complicada e acerta com frases curtas. Aprendeu com quem veio antes e não tem pressa de jogar fora o que funciona. Às vezes o mundo te chama de atrasado justamente quando você está certo.',0.4053],
+   'Você desconfia de conversa complicada e acerta com frases curtas. Aprendeu com quem veio antes e não tem pressa de jogar fora o que funciona. Às vezes o mundo te chama de atrasado justamente quando você está certo.',0.7232],
   ['Artesã','da','Criatividade',['arte','precisao','inovacao','analise','sonho'],
-   'Você repara no detalhe que ninguém vê e não descansa até ele ficar no lugar. Faz com a mão o que a maioria só imagina. A armadilha é refazer para sempre uma coisa que já estava boa.',0.3878],
+   'Você repara no detalhe que ninguém vê e não descansa até ele ficar no lugar. Faz com a mão o que a maioria só imagina. A armadilha é refazer para sempre uma coisa que já estava boa.',0.6476],
   ['Pescador','do','Paciência',['analise','misterio','intuicao','precisao','estabilidade'],
-   'Você sabe esperar o tempo certo e desconfia de pressa. Observa muito antes de agir, e quando age raramente erra. Mas há coisas na sua vida que estão esperando há tempo demais.',0.3696],
+   'Você sabe esperar o tempo certo e desconfia de pressa. Observa muito antes de agir, e quando age raramente erra. Mas há coisas na sua vida que estão esperando há tempo demais.',0.5471],
   ['Mateiro','do','Exploração',['curiosidade','aventura','visao','ambicao','coragem'],
-   'Você entra onde não tem trilha e volta sabendo o caminho. Enxerga o fim da história quando os outros ainda estão no começo, e cansa de esperar que cheguem lá. O difícil é aceitar companhia num ritmo mais lento que o seu.',0.4008],
+   'Você entra onde não tem trilha e volta sabendo o caminho. Enxerga o fim da história quando os outros ainda estão no começo, e cansa de esperar que cheguem lá. O difícil é aceitar companhia num ritmo mais lento que o seu.',0.7009],
   ['Carnavalesco','do','Alegria e conexão',['palco','carisma','otimismo','sensualidade','inspiracao'],
-   'Você entra num lugar e o clima muda. Junta gente que não se conhecia e faz parecer fácil, quando é trabalho. Poucos percebem quanto você segura por dentro para manter a festa de pé.',0.4896],
+   'Você entra num lugar e o clima muda. Junta gente que não se conhecia e faz parecer fácil, quando é trabalho. Poucos percebem quanto você segura por dentro para manter a festa de pé.',0.7832],
   ['Repentista','do','A palavra',['palavra','franqueza','inspiracao','esperteza','palco'],
-   'Você responde antes de pensar e acerta. A palavra é a sua arma e o seu abrigo, e você já mudou o rumo de alguém com uma frase que nem lembra ter dito. O outro lado é a verdade que sai na hora errada.',0.7621],
+   'Você responde antes de pensar e acerta. A palavra é a sua arma e o seu abrigo, e você já mudou o rumo de alguém com uma frase que nem lembra ter dito. O outro lado é a verdade que sai na hora errada.',1],
   ['Seresteiro','do','Saudade',['sensibilidade','paixao','arte','sonho','intensidade'],
-   'Você sente as coisas inteiras, nunca pela metade, e guarda com cuidado o que já passou. Transforma falta em beleza. Mas há uma diferença entre honrar a saudade e morar dentro dela.',0.3248]
+   'Você sente as coisas inteiras, nunca pela metade, e guarda com cuidado o que já passou. Transforma falta em beleza. Mas há uma diferença entre honrar a saudade e morar dentro dela.',0.4946]
 ];
 
 function escolherRaiz(w,seed){
-  // o fator (índice 5) equaliza a distribuição: sem ele, uma em cada quatro
-  // pessoas cairia na Benzedeira e o Repentista quase nunca sairia
+  // o fator (índice 5) equaliza a distribuição. RECALIBRADO sobre 15.600 perfis
+  // depois que Alma e Personalidade entraram no buildTags: com os fatores antigos
+  // o Repentista saltava para 19,4%. Agora a faixa é 7,0% a 8,6%.
+  // Mexeu em etiqueta, peso ou tabela? Rode calibrar.mjs de novo.
   const notas=RAIZ.map(r=>[r,r[3].reduce((s,t)=>s+(w[t]||0),0)*r[5]]);
   const max=Math.max(...notas.map(n=>n[1]));
   // empate é comum: a semente decide, sempre igual para a mesma pessoa
@@ -255,6 +294,8 @@ function origemLabel(kind,c){
   if(kind==='animal')return (ART_ANIMAL[c.animal]||'do')+' '+c.animal;
   if(kind==='elem')return (ART_ELEM[c.elemento]||'do')+' '+c.elemento;
   if(kind==='num')return 'do seu Caminho '+c.lp;
+  if(kind==='alma')return 'do seu Número da Alma '+c.alma;
+  if(kind==='persona')return 'do seu Número da Personalidade '+c.persona;
   return 'do seu nome';
 }
 
@@ -270,8 +311,38 @@ function somaEntre(primeiro,segundo){
   return v+' a '+segundo;
 }
 
+/* Explica de onde veio UMA etiqueta: "a coragem de Áries", "o cuidado do seu
+   Número da Alma 6". Usado pelo arquétipo, pelo superpoder e pela kryptonita. */
+function derivarTraco(c,tag,comps){
+  const prioridade={signo:0,num:1,alma:2,animal:3,elem:4,exp:5,persona:6};
+  const achados=comps.filter(cp=>cp.tags.indexOf(tag)>=0)
+                     .sort((a,b)=>prioridade[a.kind]-prioridade[b.kind]);
+  if(!achados.length||!SUBST[tag])return null;
+  return SUBST[tag]+' '+origemLabel(achados[0].kind,c);
+}
+
+/* Explica um item que tem VÁRIAS etiquetas (arquétipo, profissão, época):
+   cita no máximo duas origens diferentes, nunca repetindo a mesma fonte. */
+function derivarItem(c,tags,comps){
+  const prioridade={signo:0,num:1,alma:2,animal:3,elem:4,exp:5,persona:6};
+  const achados=[];
+  tags.forEach(t=>comps.forEach(cp=>{
+    if(cp.tags.indexOf(t)>=0 && SUBST[t]) achados.push({t,kind:cp.kind});
+  }));
+  achados.sort((a,b)=>prioridade[a.kind]-prioridade[b.kind]);
+  const origens=new Set(), traos=new Set(), sel=[];
+  for(const a of achados){
+    if(origens.has(a.kind)||traos.has(a.t))continue;
+    origens.add(a.kind); traos.add(a.t); sel.push(a);
+    if(sel.length===2)break;
+  }
+  if(!sel.length)return null;
+  const ps=sel.map(a=>SUBST[a.t]+' '+origemLabel(a.kind,c));
+  return sel.length===2 ? inicial(ps[0])+' '+somaEntre(ps[0],ps[1])+'.' : inicial(ps[0])+'.';
+}
+
 function derivarRaiz(c,raiz,comps,seed){
-  const prioridade={signo:0,num:1,animal:2,elem:3,exp:4};
+  const prioridade={signo:0,num:1,alma:2,animal:3,elem:4,exp:5,persona:6};
   const achados=[];
   raiz[3].forEach(t=>comps.forEach(cp=>{
     if(cp.tags.indexOf(t)>=0 && SUBST[t]) achados.push({t,kind:cp.kind});
@@ -302,6 +373,8 @@ export function calcularBase(nome, y, m, d) {
     elemento: chineseElement(y, m, d),
     lp: lifePath(y, m, d),
     exp: expression(primeiro),
+    alma: almaNum(nome),
+    persona: personaNum(nome),
     idade: ageAt(y, m, d)
   };
 }
@@ -318,13 +391,13 @@ export function gerarPerfil(nome, y, m, d, uf) {
   const arqNome = arq[0] + (arqScores[1][1] > 0 ? ' ' + arq2[0].replace(/^O /, '').replace(/^A /, '') : '');
 
   const midia = {
-    filme: pickMedia(MIDIA.filme, w, comps, seed, 1),
-    livro: pickMedia(MIDIA.livro, w, comps, seed, 2),
-    serie: pickMedia(MIDIA.serie, w, comps, seed, 3),
-    novela: pickMedia(MIDIA.novela, w, comps, seed, 4),
-    musica: pickMedia(MIDIA.musica, w, comps, seed, 5)
+    filme: pickMedia(MIDIA.filme, w, comps, seed, 1, FATOR_MIDIA),
+    livro: pickMedia(MIDIA.livro, w, comps, seed, 2, FATOR_MIDIA),
+    serie: pickMedia(MIDIA.serie, w, comps, seed, 3, FATOR_MIDIA),
+    novela: pickMedia(MIDIA.novela, w, comps, seed, 4, FATOR_MIDIA),
+    musica: pickMedia(MIDIA.musica, w, comps, seed, 5, FATOR_MIDIA)
   };
-  const profs = pickProfs(w, comps, seed);
+  const profs = pickProfs(w, comps, seed, FATOR_PROF);
   const ep = EPOCA.map(e => [e, e[1].reduce((s, t) => s + (w[t] || 0), 0)]).sort((a, b2) => b2[1] - a[1]);
   const epChoice = (() => {
     const max = ep[0][1];
@@ -353,7 +426,7 @@ export function gerarPerfil(nome, y, m, d, uf) {
       nome: c.nome, primeiro: c.primeiro, signo: c.signo, animal: c.animal,
       elemento: c.elemento, lp: c.lp, idade: c.idade, y: c.y, m: c.m, d: c.d, uf: c.uf
     },
-    arquetipo: { nome: arqNome, lema: arq[2] },
+    arquetipo: { nome: arqNome, lema: arq[2], porque: derivarItem(c, arq[1], comps) },
     perfil: [
       `${cap(c.primeiro)}, ${SIGNO[c.signo].desc}`,
       `${NUM[c.lp].desc}${NUM[c.exp] ? ' E o seu nome vibra no número ' + c.exp + ', somando a isso um traço de ' + NUM[c.exp].tags[0] + '.' : ''}`,
@@ -371,6 +444,9 @@ export function gerarPerfil(nome, y, m, d, uf) {
     epoca: { nome: epChoice, texto: `O encontro de ${phrase(tt)} te colocaria bem no centro daquele mundo.` },
     superpoder: cap(SUPER[tt[0]] || 'transformar ideias em movimento antes de todo mundo'),
     kryptonita: cap(KRYP[tt[0]] || 'lembrar de desacelerar e deixar os outros acompanharem'),
+    // superpoder e kryptonita saem do MESMO traço dominante — uma linha explica os dois
+    duplaPorque: (function(){ const t = derivarTraco(c, tt[0], comps);
+      return t ? inicial(t) + ' — é daí que vêm os dois.' : null; })(),
     par: pares.length ? { melhores: [pares[0], pares[1]], desafio: pares[2] } : null,
     sobrenome: sobre,
     sorte: { cor: SIGNO[c.signo].cor, numero: c.lp, dia: SIGNO[c.signo].dia, pedra: SIGNO[c.signo].pedra },
